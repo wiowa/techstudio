@@ -16,6 +16,10 @@
     "skipLibCheck": true,
     "strict": true,
     "target": "es2022",
-    "customConditions": ["@wiowa-tech-studio/source"]
+    "customConditions": ["@wiowa-tech-studio/source"],
+    "paths": {
+      "mymemory/Module": ["apps/mymemory/src/remote-entry.ts"]
+    },
+    "baseUrl": "."
   }
 }
