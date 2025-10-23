@@ -1,5 +1,9 @@
 [phases.setup]
-nixPkgs = ["nodejs_22"]
+nixPkgs = ["curl", "bash"]
+cmds = [
+  "curl -fsSL https://deb.nodesource.com/setup_22.x | bash -",
+  "apt-get install -y nodejs"
+]
 
 [phases.build]
 cmds = ["npx nx build myhost --skip-nx-cache"]
