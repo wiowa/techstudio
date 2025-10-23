@@ -18,6 +18,12 @@
     "target": "es2022",
     "customConditions": ["@wiowa-tech-studio/source"],
     "paths": {
+      "@wiowa-tech-studio/ui": ["libs/shared/ui/src/index.ts"],
+      "@wiowa-tech-studio/ui/components": [
+        "libs/shared/ui/src/components/index.ts"
+      ],
+      "@wiowa-tech-studio/ui/hooks": ["libs/shared/ui/src/hooks/index.ts"],
+      "@wiowa-tech-studio/ui/lib": ["libs/shared/ui/src/lib/index.ts"],
       "mymemory/Module": ["apps/mymemory/src/remote-entry.ts"]
     },
     "baseUrl": "."
