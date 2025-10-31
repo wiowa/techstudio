@@ -1,151 +1,315 @@
-import { Button } from '@wiowa-tech-studio/ui';
+import { useState, useEffect } from 'react';
+import { Button, Card, CardContent } from '@wiowa-tech-studio/ui';
 import '../styles.css';
 
+type GameCard = {
+  id: number;
+  symbol: string;
+  isFlipped: boolean;
+  isMatched: boolean;
+};
+
+type GameMode = 'single' | 'two-player';
+
+type Player = {
+  name: string;
+  score: number;
+};
+
+const SYMBOLS = ['🎮', '🎯', '🎨', '🎭', '🎪', '🎸', '🎺', '🎻', '🎲', '🎰', '🎳', '🎾', '⚽', '🏀', '🏈', '⚾', '🎱', '🏐'];
+
 export function App() {
+  const [gameMode, setGameMode] = useState<GameMode | null>(null);
+  const [cards, setCards] = useState<GameCard[]>([]);
+  const [flippedCards, setFlippedCards] = useState<number[]>([]);
+  const [moves, setMoves] = useState(0);
+  const [matches, setMatches] = useState(0);
+  const [isGameComplete, setIsGameComplete] = useState(false);
+  const [currentPlayer, setCurrentPlayer] = useState<0 | 1>(0);
+  const [players, setPlayers] = useState<Player[]>([
+    { name: 'Player 1', score: 0 },
+    { name: 'Player 2', score: 0 }
+  ]);
+  const [isVibrating, setIsVibrating] = useState(false);
+
+  // Initialize game
+  const initializeGame = (mode?: GameMode) => {
+    const gameSymbols = SYMBOLS.slice(0, 18); // 18 pairs for 6x6 grid
+    const shuffledCards = [...gameSymbols, ...gameSymbols]
+      .sort(() => Math.random() - 0.5)
+      .map((symbol, index) => ({
+        id: index,
+        symbol,
+        isFlipped: false,
+        isMatched: false,
+      }));
+
+    setCards(shuffledCards);
+    setFlippedCards([]);
+    setMoves(0);
+    setMatches(0);
+    setIsGameComplete(false);
+    setCurrentPlayer(0);
+    setPlayers([
+      { name: 'Player 1', score: 0 },
+      { name: 'Player 2', score: 0 }
+    ]);
+    setIsVibrating(false);
+    if (mode) {
+      setGameMode(mode);
+    }
+  };
+
+  const startNewGame = () => {
+    setGameMode(null);
+    setCards([]);
+  };
+
+  // Check for match when two cards are flipped
+  useEffect(() => {
+    if (flippedCards.length === 2) {
+      const [first, second] = flippedCards;
+      const firstCard = cards.find(c => c.id === first);
+      const secondCard = cards.find(c => c.id === second);
+
+      if (firstCard && secondCard && firstCard.symbol === secondCard.symbol) {
+        // Match found
+        setTimeout(() => {
+          setCards(prev =>
+            prev.map(card =>
+              card.id === first || card.id === second
+                ? { ...card, isMatched: true }
+                : card
+            )
+          );
+          setMatches(prev => prev + 1);
+          setFlippedCards([]);
+
+          // Update score for 2-player mode
+          if (gameMode === 'two-player') {
+            setPlayers(prev => prev.map((player, idx) =>
+              idx === currentPlayer
+                ? { ...player, score: player.score + 1 }
+                : player
+            ));
+          }
+        }, 600);
+      } else {
+        // No match - trigger vibrate animation
+        setIsVibrating(true);
+        setTimeout(() => {
+          setCards(prev =>
+            prev.map(card =>
+              card.id === first || card.id === second
+                ? { ...card, isFlipped: false }
+                : card
+            )
+          );
+          setFlippedCards([]);
+          setIsVibrating(false);
+
+          // Switch player in 2-player mode
+          if (gameMode === 'two-player') {
+            setCurrentPlayer(prev => prev === 0 ? 1 : 0);
+          }
+        }, 1000);
+      }
+      setMoves(prev => prev + 1);
+    }
+  }, [flippedCards, cards, gameMode, currentPlayer]);
+
+  // Check if game is complete
+  useEffect(() => {
+    if (matches === 18 && cards.length > 0) {
+      setIsGameComplete(true);
+    }
+  }, [matches, cards]);
+
+  const handleCardClick = (id: number) => {
+    const card = cards.find(c => c.id === id);
+
+    if (!card || card.isFlipped || card.isMatched || flippedCards.length === 2) {
+      return;
+    }
+
+    setCards(prev =>
+      prev.map(c => (c.id === id ? { ...c, isFlipped: true } : c))
+    );
+    setFlippedCards(prev => [...prev, id]);
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-purple-50 py-12 px-6">
-      <div className="container mx-auto">
-        {/* Header */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-            Memory App
-          </h1>
-          <Button size="lg" className="mb-4">
-            Get Started
-          </Button>
-          <p className="text-xl text-gray-600">
-            A federated micro-frontend module
-          </p>
-        </div>
-
-        {/* Content Card */}
-        <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow-xl p-8 md:p-12">
-          <div className="space-y-6">
-            <div className="border-l-4 border-purple-600 pl-4">
-              <h2 className="text-2xl font-semibold text-gray-900 mb-2">
-                Welcome to Memory App
-              </h2>
-              <p className="text-gray-600">
-                This is a remote application loaded via Module Federation. It
-                runs independently but integrates seamlessly with the host
-                application.
+    <div className="min-h-screen bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 py-8 px-4">
+      <div className="container mx-auto max-w-5xl">
+        {/* Mode Selection */}
+        {!gameMode && (
+          <div className="flex items-center justify-center min-h-[70vh]">
+            <div className="bg-white/10 backdrop-blur-md rounded-2xl shadow-2xl p-12 text-center">
+              <h1 className="text-5xl font-bold text-white mb-4 drop-shadow-lg">
+                Memory Game
+              </h1>
+              <p className="text-xl text-white/90 mb-8">
+                Select Game Mode
               </p>
-            </div>
-
-            {/* Features */}
-            <div className="grid md:grid-cols-2 gap-6 mt-8">
-              <div className="p-6 bg-purple-50 rounded-lg">
-                <h3 className="font-semibold text-gray-900 mb-2 flex items-center">
-                  <svg
-                    className="w-5 h-5 text-purple-600 mr-2"
-                    fill="none"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-                  </svg>
-                  Independent Deployment
-                </h3>
-                <p className="text-gray-600 text-sm">
-                  Can be deployed and updated independently from the host
-                  application.
-                </p>
+              <div className="flex flex-col gap-4">
+                <Button
+                  size="lg"
+                  onClick={() => initializeGame('single')}
+                  className="bg-white text-purple-600 hover:bg-gray-100 min-w-[200px]"
+                >
+                  Single Player
+                </Button>
+                <Button
+                  size="lg"
+                  onClick={() => initializeGame('two-player')}
+                  className="bg-white text-purple-600 hover:bg-gray-100 min-w-[200px]"
+                >
+                  2 Players
+                </Button>
               </div>
-
-              <div className="p-6 bg-blue-50 rounded-lg">
-                <h3 className="font-semibold text-gray-900 mb-2 flex items-center">
-                  <svg
-                    className="w-5 h-5 text-blue-600 mr-2"
-                    fill="none"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4"></path>
-                  </svg>
-                  Shared Dependencies
-                </h3>
-                <p className="text-gray-600 text-sm">
-                  Shares React and other dependencies with the host for optimal
-                  performance.
-                </p>
-              </div>
-
-              <div className="p-6 bg-green-50 rounded-lg">
-                <h3 className="font-semibold text-gray-900 mb-2 flex items-center">
-                  <svg
-                    className="w-5 h-5 text-green-600 mr-2"
-                    fill="none"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"></path>
-                  </svg>
-                  Module Federation
-                </h3>
-                <p className="text-gray-600 text-sm">
-                  Built with Webpack Module Federation for runtime code sharing.
-                </p>
-              </div>
-
-              <div className="p-6 bg-orange-50 rounded-lg">
-                <h3 className="font-semibold text-gray-900 mb-2 flex items-center">
-                  <svg
-                    className="w-5 h-5 text-orange-600 mr-2"
-                    fill="none"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
-                  </svg>
-                  Type Safe
-                </h3>
-                <p className="text-gray-600 text-sm">
-                  Full TypeScript support for type-safe remote module loading.
-                </p>
-              </div>
-            </div>
-
-            {/* Info Box */}
-            <div className="mt-8 p-6 bg-gradient-to-r from-purple-100 to-blue-100 rounded-lg">
-              <h3 className="font-semibold text-gray-900 mb-2">
-                Technical Details
-              </h3>
-              <ul className="space-y-2 text-sm text-gray-700">
-                <li className="flex items-start">
-                  <span className="text-purple-600 mr-2">•</span>
-                  <span>
-                    <strong>Port:</strong> 4201 (development)
-                  </span>
-                </li>
-                <li className="flex items-start">
-                  <span className="text-purple-600 mr-2">•</span>
-                  <span>
-                    <strong>Exposed Module:</strong> ./Module →
-                    ./src/remote-entry.ts
-                  </span>
-                </li>
-                <li className="flex items-start">
-                  <span className="text-purple-600 mr-2">•</span>
-                  <span>
-                    <strong>Consumed by:</strong> myhost application
-                  </span>
-                </li>
-              </ul>
             </div>
           </div>
-        </div>
+        )}
+
+        {/* Game Screen */}
+        {gameMode && (
+          <>
+            {/* Header */}
+            <div className="text-center mb-8">
+              <h1 className="text-5xl font-bold text-white mb-4 drop-shadow-lg">
+                Memory Game
+              </h1>
+              <p className="text-xl text-white/90 mb-6">
+                {gameMode === 'two-player'
+                  ? `${players[currentPlayer].name}'s Turn`
+                  : 'Match all 18 pairs to win!'}
+              </p>
+
+              {/* Stats */}
+              {gameMode === 'single' && (
+                <div className="flex justify-center gap-8 mb-6">
+                  <div className="bg-white/20 backdrop-blur-sm rounded-lg px-6 py-3 text-white">
+                    <div className="text-2xl font-bold">{moves}</div>
+                    <div className="text-sm">Moves</div>
+                  </div>
+                  <div className="bg-white/20 backdrop-blur-sm rounded-lg px-6 py-3 text-white">
+                    <div className="text-2xl font-bold">{matches}/18</div>
+                    <div className="text-sm">Matches</div>
+                  </div>
+                </div>
+              )}
+
+              {/* Player Stats for 2-player mode */}
+              {gameMode === 'two-player' && (
+                <div className="flex justify-center gap-8 mb-6">
+                  {players.map((player, idx) => (
+                    <div
+                      key={idx}
+                      className={`
+                        bg-white/20 backdrop-blur-sm rounded-lg px-6 py-3 text-white
+                        transition-all duration-300
+                        ${idx === currentPlayer ? 'ring-4 ring-white scale-105' : 'opacity-70'}
+                      `}
+                    >
+                      <div className="text-2xl font-bold">{player.score}</div>
+                      <div className="text-sm">{player.name}</div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              <Button
+                size="lg"
+                onClick={startNewGame}
+                className="bg-white text-purple-600 hover:bg-gray-100"
+              >
+                New Game
+              </Button>
+            </div>
+
+            {/* Game Board */}
+            <div className={`bg-white/10 backdrop-blur-md rounded-2xl shadow-2xl p-8 ${isVibrating ? 'vibrate' : ''}`}>
+              <div className="grid grid-cols-6 gap-3">
+                {cards.map((card) => (
+                  <Card
+                    key={card.id}
+                    onClick={() => handleCardClick(card.id)}
+                    className={`
+                      aspect-square cursor-pointer
+                      transition-all duration-300 transform
+                      ${
+                        card.isFlipped || card.isMatched
+                          ? 'bg-white scale-105 shadow-lg'
+                          : 'bg-gradient-to-br from-purple-600 to-pink-600 hover:scale-105 hover:shadow-lg'
+                      }
+                      ${card.isMatched ? 'opacity-70' : ''}
+                      ${card.isFlipped || card.isMatched ? '' : 'cursor-pointer'}
+                      active:scale-95
+                    `}
+                  >
+                    <CardContent className="flex items-center justify-center h-full p-0 text-4xl font-bold">
+                      {card.isFlipped || card.isMatched ? card.symbol : '?'}
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </div>
+
+            {/* Victory Modal */}
+            {isGameComplete && (
+              <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+                <div className="bg-white rounded-2xl p-8 max-w-md mx-4 text-center shadow-2xl">
+                  <div className="text-6xl mb-4">🎉</div>
+                  <h2 className="text-3xl font-bold text-gray-900 mb-2">
+                    {gameMode === 'two-player' ? 'Game Over!' : 'Congratulations!'}
+                  </h2>
+                  {gameMode === 'single' && (
+                    <p className="text-gray-600 mb-6">
+                      You completed the game in <span className="font-bold text-purple-600">{moves}</span> moves!
+                    </p>
+                  )}
+                  {gameMode === 'two-player' && (
+                    <>
+                      <div className="mb-6">
+                        {players[0].score > players[1].score ? (
+                          <p className="text-gray-600">
+                            <span className="font-bold text-purple-600">{players[0].name}</span> wins with{' '}
+                            <span className="font-bold">{players[0].score}</span> matches!
+                          </p>
+                        ) : players[1].score > players[0].score ? (
+                          <p className="text-gray-600">
+                            <span className="font-bold text-purple-600">{players[1].name}</span> wins with{' '}
+                            <span className="font-bold">{players[1].score}</span> matches!
+                          </p>
+                        ) : (
+                          <p className="text-gray-600">
+                            It's a tie! Both players scored{' '}
+                            <span className="font-bold text-purple-600">{players[0].score}</span> matches!
+                          </p>
+                        )}
+                      </div>
+                      <div className="grid grid-cols-2 gap-4 mb-6">
+                        {players.map((player, idx) => (
+                          <div key={idx} className="bg-purple-50 rounded-lg p-4">
+                            <div className="text-lg font-semibold text-gray-800">{player.name}</div>
+                            <div className="text-2xl font-bold text-purple-600">{player.score}</div>
+                          </div>
+                        ))}
+                      </div>
+                    </>
+                  )}
+                  <Button
+                    size="lg"
+                    onClick={startNewGame}
+                    className="w-full"
+                  >
+                    New Game
+                  </Button>
+                </div>
+              </div>
+            )}
+          </>
+        )}
       </div>
     </div>
   );
