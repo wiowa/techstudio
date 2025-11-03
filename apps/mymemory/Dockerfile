@@ -18,7 +18,7 @@ ENV PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
 RUN npm ci --prefer-offline --no-audit
 
 # Build mymemory
-RUN npx nx build mymemory --production
+RUN npx nx run mymemory:build:production
 
 # Production stage
 FROM nginx:alpine

@@ -18,7 +18,7 @@ ENV PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
 RUN npm ci --prefer-offline --no-audit
 
 # Build myhost (this will also build dependencies like mymemory if needed)
-RUN npx nx build myhost -c production
+RUN npx nx run myhost:build:production
 
 # Production stage
 FROM nginx:alpine
