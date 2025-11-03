@@ -165,7 +165,7 @@ export function App() {
   };
 
   return (
-    <div className="min-h-screen bg-background py-8 px-4">
+    <div className="min-h-screen max-h-screen bg-background py-8 px-4">
       <div className="container mx-auto max-w-5xl">
         {/* Mode Selection */}
         {!gameMode && (
@@ -229,21 +229,21 @@ export function App() {
               {gameMode === 'two-player' && (
                 <div className="flex justify-center gap-8 mb-6">
                   {players.map((player, idx) => (
-                    <div
+                    <Card
                       key={idx}
                       className={`
-                        bg-white/20 backdrop-blur-sm rounded-lg px-6 py-3 text-white
+                       bg-card text-card-foreground backdrop-blur-sm rounded-lg px-6 py-3
                         transition-all duration-300
                         ${
                           idx === currentPlayer
-                            ? 'ring-4 ring-white scale-105'
+                            ? 'ring-4 ring-secondary scale-105'
                             : 'opacity-70'
                         }
                       `}
                     >
                       <div className="text-2xl font-bold">{player.score}</div>
                       <div className="text-sm">{player.name}</div>
-                    </div>
+                    </Card>
                   ))}
                 </div>
               )}

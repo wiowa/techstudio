@@ -1,8 +1,8 @@
 import {
+  Button,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@wiowa-tech-studio/ui';
@@ -48,7 +48,10 @@ export function Topbar() {
           </nav>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <button className="md:hidden text-white">
+              <Button
+                variant={'ghost'}
+                className="md:hidden text-secondary-foreground"
+              >
                 <svg
                   className="w-6 h-6"
                   fill="none"
@@ -60,18 +63,19 @@ export function Topbar() {
                 >
                   <path d="M4 6h16M4 12h16M4 18h16"></path>
                 </svg>
-              </button>
+              </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56">
-              <DropdownMenuLabel>Hello</DropdownMenuLabel>
-              <DropdownMenuSeparator />
+            <DropdownMenuContent align="end">
               <DropdownMenuItem>
                 <Link to={'/'}>Home</Link>
               </DropdownMenuItem>
+              <DropdownMenuSeparator />
               <DropdownMenuItem>
                 <Link to={'/mymemory'}>Memory</Link>
               </DropdownMenuItem>
+              <DropdownMenuSeparator />
               <DropdownMenuItem>About</DropdownMenuItem>
+              <DropdownMenuSeparator />
               <DropdownMenuItem>Contact</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
