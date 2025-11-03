@@ -11,8 +11,8 @@ export function LandingPage() {
             </span>
           </h1>
           <p className="text-xl md:text-2xl text-gray-600 mb-8 max-w-3xl mx-auto">
-            Building innovative solutions with cutting-edge technology.
-            We create powerful micro-frontend applications that scale.
+            Building innovative solutions with cutting-edge technology. We
+            create powerful MFE applications that scale.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <button className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-3 rounded-lg font-semibold hover:shadow-lg transition-all duration-200 transform hover:scale-105">
@@ -49,7 +49,8 @@ export function LandingPage() {
               Lightning Fast
             </h3>
             <p className="text-gray-600">
-              Built with modern technologies like React 19 and Rspack for optimal performance.
+              Built with modern technologies like React 19 and Rspack for
+              optimal performance.
             </p>
           </div>
 
@@ -71,7 +72,8 @@ export function LandingPage() {
               Micro-Frontends
             </h3>
             <p className="text-gray-600">
-              Scalable architecture using Module Federation for independent deployments.
+              Scalable architecture using Module Federation for independent
+              deployments.
             </p>
           </div>
 
@@ -93,7 +95,8 @@ export function LandingPage() {
               Type Safe
             </h3>
             <p className="text-gray-600">
-              Full TypeScript support with strict mode for reliable, maintainable code.
+              Full TypeScript support with strict mode for reliable,
+              maintainable code.
             </p>
           </div>
         </div>
