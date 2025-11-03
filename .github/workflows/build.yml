@@ -30,20 +30,34 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
-          cache: 'npm'
 
-      - name: Configure npm
-        run: |
-          npm config set fetch-retry-mintimeout 20000
-          npm config set fetch-retry-maxtimeout 120000
-          npm config set fetch-timeout 300000
+      - name: Get npm cache directory
+        id: npm-cache-dir
+        run: echo "dir=$(npm config get cache)" >> $GITHUB_OUTPUT
+
+      - name: Cache node modules
+        uses: actions/cache@v4
+        id: npm-cache
+        with:
+          path: |
+            ${{ steps.npm-cache-dir.outputs.dir }}
+            node_modules
+            ~/.cache
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
 
       - name: Install dependencies
-        run: npm install --frozen-lockfile --prefer-offline --no-audit --loglevel=verbose
-        timeout-minutes: 10
+        if: steps.npm-cache.outputs.cache-hit != 'true'
+        run: |
+          npm config set registry https://registry.npmjs.org/
+          npm config set network-timeout 600000
+          npm install --legacy-peer-deps --no-optional
+        timeout-minutes: 15
         env:
           PUPPETEER_SKIP_DOWNLOAD: 'true'
           PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: '1'
+          NODE_OPTIONS: '--max-old-space-size=4096'
 
       - name: Run type check
         run: |
