@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
 import { Button, Card, CardContent } from '@wiowa-tech-studio/ui';
+import { useEffect, useState } from 'react';
 import '../styles.css';
 
 type GameCard = {
@@ -16,7 +16,26 @@ type Player = {
   score: number;
 };
 
-const SYMBOLS = ['🎮', '🎯', '🎨', '🎭', '🎪', '🎸', '🎺', '🎻', '🎲', '🎰', '🎳', '🎾', '⚽', '🏀', '🏈', '⚾', '🎱', '🏐'];
+const SYMBOLS = [
+  '🎮',
+  '🎯',
+  '🎨',
+  '🎭',
+  '🎪',
+  '🎸',
+  '🎺',
+  '🎻',
+  '🎲',
+  '🎰',
+  '🎳',
+  '🎾',
+  '⚽',
+  '🏀',
+  '🏈',
+  '⚾',
+  '🎱',
+  '🏐',
+];
 
 export function App() {
   const [gameMode, setGameMode] = useState<GameMode | null>(null);
@@ -28,7 +47,7 @@ export function App() {
   const [currentPlayer, setCurrentPlayer] = useState<0 | 1>(0);
   const [players, setPlayers] = useState<Player[]>([
     { name: 'Player 1', score: 0 },
-    { name: 'Player 2', score: 0 }
+    { name: 'Player 2', score: 0 },
   ]);
   const [isVibrating, setIsVibrating] = useState(false);
 
@@ -52,7 +71,7 @@ export function App() {
     setCurrentPlayer(0);
     setPlayers([
       { name: 'Player 1', score: 0 },
-      { name: 'Player 2', score: 0 }
+      { name: 'Player 2', score: 0 },
     ]);
     setIsVibrating(false);
     if (mode) {
@@ -69,37 +88,39 @@ export function App() {
   useEffect(() => {
     if (flippedCards.length === 2) {
       const [first, second] = flippedCards;
-      const firstCard = cards.find(c => c.id === first);
-      const secondCard = cards.find(c => c.id === second);
+      const firstCard = cards.find((c) => c.id === first);
+      const secondCard = cards.find((c) => c.id === second);
 
       if (firstCard && secondCard && firstCard.symbol === secondCard.symbol) {
         // Match found
         setTimeout(() => {
-          setCards(prev =>
-            prev.map(card =>
+          setCards((prev) =>
+            prev.map((card) =>
               card.id === first || card.id === second
                 ? { ...card, isMatched: true }
                 : card
             )
           );
-          setMatches(prev => prev + 1);
+          setMatches((prev) => prev + 1);
           setFlippedCards([]);
 
           // Update score for 2-player mode
           if (gameMode === 'two-player') {
-            setPlayers(prev => prev.map((player, idx) =>
-              idx === currentPlayer
-                ? { ...player, score: player.score + 1 }
-                : player
-            ));
+            setPlayers((prev) =>
+              prev.map((player, idx) =>
+                idx === currentPlayer
+                  ? { ...player, score: player.score + 1 }
+                  : player
+              )
+            );
           }
         }, 600);
       } else {
         // No match - trigger vibrate animation
         setIsVibrating(true);
         setTimeout(() => {
-          setCards(prev =>
-            prev.map(card =>
+          setCards((prev) =>
+            prev.map((card) =>
               card.id === first || card.id === second
                 ? { ...card, isFlipped: false }
                 : card
@@ -110,11 +131,11 @@ export function App() {
 
           // Switch player in 2-player mode
           if (gameMode === 'two-player') {
-            setCurrentPlayer(prev => prev === 0 ? 1 : 0);
+            setCurrentPlayer((prev) => (prev === 0 ? 1 : 0));
           }
         }, 1000);
       }
-      setMoves(prev => prev + 1);
+      setMoves((prev) => prev + 1);
     }
   }, [flippedCards, cards, gameMode, currentPlayer]);
 
@@ -126,48 +147,53 @@ export function App() {
   }, [matches, cards]);
 
   const handleCardClick = (id: number) => {
-    const card = cards.find(c => c.id === id);
+    const card = cards.find((c) => c.id === id);
 
-    if (!card || card.isFlipped || card.isMatched || flippedCards.length === 2) {
+    if (
+      !card ||
+      card.isFlipped ||
+      card.isMatched ||
+      flippedCards.length === 2
+    ) {
       return;
     }
 
-    setCards(prev =>
-      prev.map(c => (c.id === id ? { ...c, isFlipped: true } : c))
+    setCards((prev) =>
+      prev.map((c) => (c.id === id ? { ...c, isFlipped: true } : c))
     );
-    setFlippedCards(prev => [...prev, id]);
+    setFlippedCards((prev) => [...prev, id]);
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 py-8 px-4">
+    <div className="min-h-screen bg-background py-8 px-4">
       <div className="container mx-auto max-w-5xl">
         {/* Mode Selection */}
         {!gameMode && (
           <div className="flex items-center justify-center min-h-[70vh]">
-            <div className="bg-white/10 backdrop-blur-md rounded-2xl shadow-2xl p-12 text-center">
-              <h1 className="text-5xl font-bold text-white mb-4 drop-shadow-lg">
+            <Card className="bg-white/10 backdrop-blur-md rounded-2xl shadow-2xl p-12 text-center">
+              <h1 className="text-5xl font-bold text-primary mb-4 drop-shadow-lg">
                 Memory Game
               </h1>
-              <p className="text-xl text-white/90 mb-8">
+              <p className="text-xl text-secondary-foreground mb-8">
                 Select Game Mode
               </p>
               <div className="flex flex-col gap-4">
                 <Button
                   size="lg"
                   onClick={() => initializeGame('single')}
-                  className="bg-white text-purple-600 hover:bg-gray-100 min-w-[200px]"
+                  className="bg-foreground min-w-[200px]"
                 >
                   Single Player
                 </Button>
                 <Button
                   size="lg"
                   onClick={() => initializeGame('two-player')}
-                  className="bg-white text-purple-600 hover:bg-gray-100 min-w-[200px]"
+                  className="bg-foreground min-w-[200px]"
                 >
                   2 Players
                 </Button>
               </div>
-            </div>
+            </Card>
           </div>
         )}
 
@@ -208,7 +234,11 @@ export function App() {
                       className={`
                         bg-white/20 backdrop-blur-sm rounded-lg px-6 py-3 text-white
                         transition-all duration-300
-                        ${idx === currentPlayer ? 'ring-4 ring-white scale-105' : 'opacity-70'}
+                        ${
+                          idx === currentPlayer
+                            ? 'ring-4 ring-white scale-105'
+                            : 'opacity-70'
+                        }
                       `}
                     >
                       <div className="text-2xl font-bold">{player.score}</div>
@@ -228,7 +258,11 @@ export function App() {
             </div>
 
             {/* Game Board */}
-            <div className={`bg-white/10 backdrop-blur-md rounded-2xl shadow-2xl p-8 ${isVibrating ? 'vibrate' : ''}`}>
+            <div
+              className={`bg-white/10 backdrop-blur-md rounded-2xl shadow-2xl p-8 ${
+                isVibrating ? 'vibrate' : ''
+              }`}
+            >
               <div className="grid grid-cols-6 gap-3">
                 {cards.map((card) => (
                   <Card
@@ -243,7 +277,9 @@ export function App() {
                           : 'bg-gradient-to-br from-purple-600 to-pink-600 hover:scale-105 hover:shadow-lg'
                       }
                       ${card.isMatched ? 'opacity-70' : ''}
-                      ${card.isFlipped || card.isMatched ? '' : 'cursor-pointer'}
+                      ${
+                        card.isFlipped || card.isMatched ? '' : 'cursor-pointer'
+                      }
                       active:scale-95
                     `}
                   >
@@ -261,11 +297,15 @@ export function App() {
                 <div className="bg-white rounded-2xl p-8 max-w-md mx-4 text-center shadow-2xl">
                   <div className="text-6xl mb-4">🎉</div>
                   <h2 className="text-3xl font-bold text-gray-900 mb-2">
-                    {gameMode === 'two-player' ? 'Game Over!' : 'Congratulations!'}
+                    {gameMode === 'two-player'
+                      ? 'Game Over!'
+                      : 'Congratulations!'}
                   </h2>
                   {gameMode === 'single' && (
                     <p className="text-gray-600 mb-6">
-                      You completed the game in <span className="font-bold text-purple-600">{moves}</span> moves!
+                      You completed the game in{' '}
+                      <span className="font-bold text-purple-600">{moves}</span>{' '}
+                      moves!
                     </p>
                   )}
                   {gameMode === 'two-player' && (
@@ -273,36 +313,54 @@ export function App() {
                       <div className="mb-6">
                         {players[0].score > players[1].score ? (
                           <p className="text-gray-600">
-                            <span className="font-bold text-purple-600">{players[0].name}</span> wins with{' '}
-                            <span className="font-bold">{players[0].score}</span> matches!
+                            <span className="font-bold text-purple-600">
+                              {players[0].name}
+                            </span>{' '}
+                            wins with{' '}
+                            <span className="font-bold">
+                              {players[0].score}
+                            </span>{' '}
+                            matches!
                           </p>
                         ) : players[1].score > players[0].score ? (
                           <p className="text-gray-600">
-                            <span className="font-bold text-purple-600">{players[1].name}</span> wins with{' '}
-                            <span className="font-bold">{players[1].score}</span> matches!
+                            <span className="font-bold text-purple-600">
+                              {players[1].name}
+                            </span>{' '}
+                            wins with{' '}
+                            <span className="font-bold">
+                              {players[1].score}
+                            </span>{' '}
+                            matches!
                           </p>
                         ) : (
                           <p className="text-gray-600">
                             It's a tie! Both players scored{' '}
-                            <span className="font-bold text-purple-600">{players[0].score}</span> matches!
+                            <span className="font-bold text-purple-600">
+                              {players[0].score}
+                            </span>{' '}
+                            matches!
                           </p>
                         )}
                       </div>
                       <div className="grid grid-cols-2 gap-4 mb-6">
                         {players.map((player, idx) => (
-                          <div key={idx} className="bg-purple-50 rounded-lg p-4">
-                            <div className="text-lg font-semibold text-gray-800">{player.name}</div>
-                            <div className="text-2xl font-bold text-purple-600">{player.score}</div>
+                          <div
+                            key={idx}
+                            className="bg-purple-50 rounded-lg p-4"
+                          >
+                            <div className="text-lg font-semibold text-gray-800">
+                              {player.name}
+                            </div>
+                            <div className="text-2xl font-bold text-purple-600">
+                              {player.score}
+                            </div>
                           </div>
                         ))}
                       </div>
                     </>
                   )}
-                  <Button
-                    size="lg"
-                    onClick={startNewGame}
-                    className="w-full"
-                  >
+                  <Button size="lg" onClick={startNewGame} className="w-full">
                     New Game
                   </Button>
                 </div>

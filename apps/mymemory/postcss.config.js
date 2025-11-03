@@ -7,6 +7,16 @@ const { join } = require('path');
 
 module.exports = {
   plugins: {
+    'postcss-import': {
+      resolve: (id) => {
+        // Resolve @wiowa-tech-studio/ui alias for CSS imports
+        if (id.startsWith('@wiowa-tech-studio/ui/')) {
+          const path = id.replace('@wiowa-tech-studio/ui/', '');
+          return join(__dirname, '../../libs/shared/ui/src/', path);
+        }
+        return id;
+      },
+    },
     tailwindcss: {
       config: join(__dirname, 'tailwind.config.js'),
     },

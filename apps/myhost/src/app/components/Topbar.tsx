@@ -10,38 +10,38 @@ import { Link } from 'react-router-dom';
 
 export function Topbar() {
   return (
-    <header className="bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg">
+    <header className="bg-background shadow-md sticky top-0 z-50">
       <div className="container mx-auto px-6 py-4">
         <div className="flex items-center justify-between">
           <Link to="/" className="flex items-center space-x-2">
             <div className="text-2xl font-bold">
-              <span className="text-white">Wiowa</span>
-              <span className="text-blue-200"> Tech Studio</span>
+              <span className="text-secondary-foreground">Wiowa</span>
+              <span className="text-primary"> Tech Studio</span>
             </div>
           </Link>
 
           <nav className="hidden md:flex items-center space-x-8">
             <Link
               to="/"
-              className="hover:text-blue-200 transition-colors duration-200"
+              className="hover:text-muted-foreground transition-colors duration-200"
             >
               Home
             </Link>
             <Link
               to="/mymemory"
-              className="hover:text-blue-200 transition-colors duration-200"
+              className="hover:text-muted-foreground transition-colors duration-200"
             >
               Memory
             </Link>
             <a
               href="#about"
-              className="hover:text-blue-200 transition-colors duration-200"
+              className="hover:text-muted-foreground transition-colors duration-200"
             >
               About
             </a>
             <a
               href="#contact"
-              className="hover:text-blue-200 transition-colors duration-200"
+              className="hover:text-muted-foreground transition-colors duration-200"
             >
               Contact
             </a>

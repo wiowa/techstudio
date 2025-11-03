@@ -9,6 +9,11 @@ import { join } from 'path';
 import config from './module-federation.config';
 
 export default {
+  resolve: {
+    alias: {
+      '@wiowa-tech-studio/ui': join(__dirname, '../../libs/shared/ui/src'),
+    },
+  },
   output: {
     path: join(__dirname, 'dist'),
     publicPath: 'auto',
