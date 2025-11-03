@@ -170,7 +170,7 @@ export function App() {
         {/* Mode Selection */}
         {!gameMode && (
           <div className="flex items-center justify-center min-h-[70vh]">
-            <Card className="bg-white/10 backdrop-blur-md rounded-2xl shadow-2xl p-12 text-center">
+            <Card className="bg-card text-card-foreground backdrop-blur-md rounded-2xl shadow-2xl p-12 text-center">
               <h1 className="text-5xl font-bold text-primary mb-4 drop-shadow-lg">
                 Memory Game
               </h1>
@@ -181,14 +181,14 @@ export function App() {
                 <Button
                   size="lg"
                   onClick={() => initializeGame('single')}
-                  className="bg-foreground min-w-[200px]"
+                  className="text-secondary-foreground inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus:outline-none focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground h-9 px-4 py-2 min-w-[200px]"
                 >
                   Single Player
                 </Button>
                 <Button
                   size="lg"
                   onClick={() => initializeGame('two-player')}
-                  className="bg-foreground min-w-[200px]"
+                  className="text-secondary-foreground inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus:outline-none focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground h-9 px-4 py-2 min-w-[200px]"
                 >
                   2 Players
                 </Button>
@@ -202,10 +202,10 @@ export function App() {
           <>
             {/* Header */}
             <div className="text-center mb-8">
-              <h1 className="text-5xl font-bold text-white mb-4 drop-shadow-lg">
+              <h1 className="text-5xl font-bold text-primary mb-4 drop-shadow-lg">
                 Memory Game
               </h1>
-              <p className="text-xl text-white/90 mb-6">
+              <p className="text-xl text-secondary-foreground mb-6">
                 {gameMode === 'two-player'
                   ? `${players[currentPlayer].name}'s Turn`
                   : 'Match all 18 pairs to win!'}
@@ -214,14 +214,14 @@ export function App() {
               {/* Stats */}
               {gameMode === 'single' && (
                 <div className="flex justify-center gap-8 mb-6">
-                  <div className="bg-white/20 backdrop-blur-sm rounded-lg px-6 py-3 text-white">
-                    <div className="text-2xl font-bold">{moves}</div>
+                  <Card className="bg-card text-card-foreground  backdrop-blur-sm rounded-lg px-6 py-3">
+                    <div className=" text-2xl font-bold">{moves}</div>
                     <div className="text-sm">Moves</div>
-                  </div>
-                  <div className="bg-white/20 backdrop-blur-sm rounded-lg px-6 py-3 text-white">
+                  </Card>
+                  <Card className="bg-card backdrop-blur-sm rounded-lg px-6 py-3">
                     <div className="text-2xl font-bold">{matches}/18</div>
                     <div className="text-sm">Matches</div>
-                  </div>
+                  </Card>
                 </div>
               )}
 
@@ -251,7 +251,7 @@ export function App() {
               <Button
                 size="lg"
                 onClick={startNewGame}
-                className="bg-white text-purple-600 hover:bg-gray-100"
+                className="bg-secondary-foreground text-secondary"
               >
                 New Game
               </Button>
@@ -273,8 +273,8 @@ export function App() {
                       transition-all duration-300 transform
                       ${
                         card.isFlipped || card.isMatched
-                          ? 'bg-white scale-105 shadow-lg'
-                          : 'bg-gradient-to-br from-purple-600 to-pink-600 hover:scale-105 hover:shadow-lg'
+                          ? 'bg-card scale-105 shadow-lg'
+                          : 'bg-gradient-to-br from-secondary to-primary hover:scale-105 hover:shadow-lg'
                       }
                       ${card.isMatched ? 'opacity-70' : ''}
                       ${

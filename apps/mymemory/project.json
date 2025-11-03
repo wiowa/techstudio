@@ -9,7 +9,7 @@
       "options": {
         "port": 4201
       },
-      "dependsOn": ["typecheck", "myhost:serve"]
+      "dependsOn": ["typecheck"]
     },
     "build": {
       "dependsOn": ["^build", "typecheck"]
