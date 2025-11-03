@@ -27,9 +27,9 @@ jobs:
         with:
           node-version: '22'
 
-      - name: Install dependencies (npm install)
-        run: npm install --legacy-peer-deps
-        timeout-minutes: 20
+      - name: Install dependencies
+        run: npm ci --omit=optional --legacy-peer-deps
+        timeout-minutes: 10
         env:
           PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: '1'
           CI: true
