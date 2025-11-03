@@ -51,7 +51,9 @@ jobs:
         if: steps.npm-cache.outputs.cache-hit != 'true'
         run: |
           npm config set registry https://registry.npmjs.org/
-          npm config set network-timeout 600000
+          npm config set fetch-timeout 600000
+          npm config set fetch-retry-mintimeout 20000
+          npm config set fetch-retry-maxtimeout 120000
           npm install --legacy-peer-deps --no-optional
         timeout-minutes: 15
         env:
