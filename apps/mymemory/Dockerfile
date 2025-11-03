@@ -34,7 +34,17 @@ RUN echo 'server { \
     index index.html; \
     \
     location / { \
-    try_files $uri $uri/ /index.html; \
+        # CORS headers for Module Federation \
+        add_header Access-Control-Allow-Origin "https://studio.wiowa.tech" always; \
+        add_header Access-Control-Allow-Methods "GET, POST, OPTIONS" always; \
+        add_header Access-Control-Allow-Headers "Content-Type" always; \
+        \
+        # Handle preflight requests \
+        if ($request_method = OPTIONS) { \
+            return 204; \
+        } \
+        \
+        try_files $uri $uri/ /index.html; \
     } \
     \
     # Enable gzip compression \
