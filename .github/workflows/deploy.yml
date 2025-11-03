@@ -1,0 +1,85 @@
+name: Deploy Affected Apps
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  check-affected:
+    runs-on: ubuntu-latest
+    outputs:
+      myhost-affected: ${{ steps.affected.outputs.myhost }}
+      mymemory-affected: ${{ steps.affected.outputs.mymemory }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install dependencies (minimal for nx)
+        run: npm install --prefer-offline --no-audit --no-fund
+        env:
+          PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: '1'
+
+      - name: Check affected projects
+        id: affected
+        run: |
+          # Get affected projects
+          AFFECTED=$(npx nx show projects --affected --base=origin/main --head=HEAD)
+
+          echo "Affected projects:"
+          echo "$AFFECTED"
+
+          # Check if myhost is affected
+          if echo "$AFFECTED" | grep -q "myhost"; then
+            echo "myhost=true" >> $GITHUB_OUTPUT
+            echo "✅ myhost is affected"
+          else
+            echo "myhost=false" >> $GITHUB_OUTPUT
+            echo "⏭️  myhost is not affected"
+          fi
+
+          # Check if mymemory is affected
+          if echo "$AFFECTED" | grep -q "mymemory"; then
+            echo "mymemory=true" >> $GITHUB_OUTPUT
+            echo "✅ mymemory is affected"
+          else
+            echo "mymemory=false" >> $GITHUB_OUTPUT
+            echo "⏭️  mymemory is not affected"
+          fi
+
+  deploy-myhost:
+    needs: check-affected
+    if: needs.check-affected.outputs.myhost-affected == 'true'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Trigger Coolify deployment for myhost
+        run: |
+          curl -X POST \
+            -H "Authorization: Bearer ${{ secrets.COOLIFY_API_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            "${{ secrets.COOLIFY_URL }}/api/v1/deploy?uuid=${{ secrets.COOLIFY_UUID_MYHOST }}&force=true"
+          echo "✅ Triggered deployment for myhost"
+
+  deploy-mymemory:
+    needs: check-affected
+    if: needs.check-affected.outputs.mymemory-affected == 'true'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Trigger Coolify deployment for mymemory
+        run: |
+          curl -X POST \
+            -H "Authorization: Bearer ${{ secrets.COOLIFY_API_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            "${{ secrets.COOLIFY_URL }}/api/v1/deploy?uuid=${{ secrets.COOLIFY_UUID_MYMEMORY }}&force=true"
+          echo "✅ Triggered deployment for mymemory"
