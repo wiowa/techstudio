@@ -1,0 +1,47 @@
+# Build stage
+FROM node:22-alpine AS builder
+
+WORKDIR /app
+
+# Copy root package files
+COPY package*.json ./
+COPY tsconfig*.json ./
+COPY nx.json ./
+
+# Copy entire workspace (needed for Nx dependencies)
+COPY apps ./apps
+COPY packages ./packages
+COPY libs ./libs
+
+# Install dependencies
+ENV PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
+RUN npm ci --prefer-offline --no-audit
+
+# Build mymemory
+RUN npx nx build mymemory --prod
+
+# Production stage
+FROM nginx:alpine
+
+# Copy built application
+COPY --from=builder /app/apps/mymemory/dist /usr/share/nginx/html
+
+# Create nginx configuration for SPA
+RUN echo 'server { \
+    listen 80; \
+    server_name _; \
+    root /usr/share/nginx/html; \
+    index index.html; \
+    \
+    location / { \
+        try_files $uri $uri/ /index.html; \
+    } \
+    \
+    # Enable gzip compression \
+    gzip on; \
+    gzip_types text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss text/javascript; \
+}' > /etc/nginx/conf.d/default.conf
+
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]
