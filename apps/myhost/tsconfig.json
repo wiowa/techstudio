@@ -3,13 +3,16 @@
   "include": [],
   "references": [
     {
+      "path": "../../libs/shared/ui"
+    },
+    {
+      "path": "../mymemory"
+    },
+    {
       "path": "./tsconfig.app.json"
     },
     {
       "path": "./tsconfig.spec.json"
-    },
-    {
-      "path": "../mymemory"
     }
   ],
   "extends": "../../tsconfig.base.json"

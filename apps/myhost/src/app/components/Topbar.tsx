@@ -1,3 +1,11 @@
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@wiowa-tech-studio/ui';
 import { Link } from 'react-router-dom';
 
 export function Topbar() {
@@ -23,7 +31,7 @@ export function Topbar() {
               to="/mymemory"
               className="hover:text-blue-200 transition-colors duration-200"
             >
-              Memory App
+              Memory
             </Link>
             <a
               href="#about"
@@ -38,20 +46,35 @@ export function Topbar() {
               Contact
             </a>
           </nav>
-
-          <button className="md:hidden text-white">
-            <svg
-              className="w-6 h-6"
-              fill="none"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path d="M4 6h16M4 12h16M4 18h16"></path>
-            </svg>
-          </button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className="md:hidden text-white">
+                <svg
+                  className="w-6 h-6"
+                  fill="none"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path d="M4 6h16M4 12h16M4 18h16"></path>
+                </svg>
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-56">
+              <DropdownMenuLabel>Hello</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem>
+                <Link to={'/'}>Home</Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <Link to={'/mymemory'}>Memory</Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem>About</DropdownMenuItem>
+              <DropdownMenuItem>Contact</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
     </header>
