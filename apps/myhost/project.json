@@ -12,7 +12,12 @@
       "dependsOn": ["typecheck"]
     },
     "build": {
-      "dependsOn": ["^build", "typecheck"]
+      "dependsOn": ["^build", "typecheck"],
+      "configurations": {
+        "production": {
+          "args": ["--config=./rspack.config.prod.ts"]
+        }
+      }
     }
   }
 }

@@ -18,7 +18,7 @@ ENV PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
 RUN npm ci --prefer-offline --no-audit
 
 # Build mymemory
-RUN npx nx build mymemory --prod
+RUN npx nx build mymemory --production
 
 # Production stage
 FROM nginx:alpine
@@ -34,13 +34,13 @@ RUN echo 'server { \
     index index.html; \
     \
     location / { \
-        try_files $uri $uri/ /index.html; \
+    try_files $uri $uri/ /index.html; \
     } \
     \
     # Enable gzip compression \
     gzip on; \
     gzip_types text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss text/javascript; \
-}' > /etc/nginx/conf.d/default.conf
+    }' > /etc/nginx/conf.d/default.conf
 
 EXPOSE 80
 

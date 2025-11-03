@@ -1,10 +1,10 @@
+import { ModuleFederationConfig } from '@nx/module-federation';
+import {
+  NxModuleFederationDevServerPlugin,
+  NxModuleFederationPlugin,
+} from '@nx/module-federation/rspack.js';
 import { NxAppRspackPlugin } from '@nx/rspack/app-plugin.js';
 import { NxReactRspackPlugin } from '@nx/rspack/react-plugin.js';
-import {
-  NxModuleFederationPlugin,
-  NxModuleFederationDevServerPlugin,
-} from '@nx/module-federation/rspack.js';
-import { ModuleFederationConfig } from '@nx/module-federation';
 import { join } from 'path';
 
 import baseConfig from './module-federation.config';
@@ -20,7 +20,7 @@ const prodConfig: ModuleFederationConfig = {
    *   ['app1', 'http://app1.example.com'],
    *   ['app2', 'http://app2.example.com'],
    * ]
-   *
+
    * You can also use a full path to the remoteEntry.js file if desired.
    *
    * remotes: [
@@ -28,7 +28,7 @@ const prodConfig: ModuleFederationConfig = {
    *   ['app2', 'http://example.com/path/to/app2/remoteEntry.js'],
    * ]
    */
-  remotes: [['mymemory', 'https://memory.wiowa.tech']],
+  remotes: [['mymemory', 'https://memory.wiowa.tech/remoteEntry.js']],
 };
 
 export default {
