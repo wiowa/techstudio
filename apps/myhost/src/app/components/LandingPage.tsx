@@ -48,7 +48,7 @@ export function LandingPage() {
             onClick={() => setGame(Game.MOTUS)}
           >
             <CardContent>
-              <h3 className="text-2xl font-semibold mb-4">Motus</h3>
+              <h3 className="text-2xl font-semibold mb-4">Motus </h3>
             </CardContent>
           </Card>
           <Card
