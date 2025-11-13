@@ -104,5 +104,5 @@ jobs:
           curl -X POST \
             -H "Authorization: Bearer ${{ secrets.COOLIFY_API_TOKEN }}" \
             -H "Content-Type: application/json" \
-            "${{ secrets.COOLIFY_URL }}/api/v1/deploy?uuid=${{ secrets.COOLIFY_UUID_MYMEMORY }}&force=true"
+            "${{ secrets.COOLIFY_URL }}/api/v1/deploy?uuid=${{ secrets.COOLIFY_UUID_MYMOTUS }}&force=true"
           echo "✅ Triggered deployment for mymotus"
