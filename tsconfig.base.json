@@ -24,7 +24,8 @@
       ],
       "@wiowa-tech-studio/ui/hooks": ["libs/shared/ui/src/hooks/index.ts"],
       "@wiowa-tech-studio/ui/lib": ["libs/shared/ui/src/lib/index.ts"],
-      "mymemory/Module": ["apps/mymemory/src/remote-entry.ts"]
+      "mymemory/Module": ["apps/mymemory/src/remote-entry.ts"],
+      "mymotus/Module": ["apps/mymotus/src/remote-entry.ts"]
     },
     "baseUrl": "."
   }
