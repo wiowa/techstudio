@@ -28,7 +28,10 @@ const prodConfig: ModuleFederationConfig = {
    *   ['app2', 'http://example.com/path/to/app2/remoteEntry.js'],
    * ]
    */
-  remotes: [['mymemory', 'https://memory.wiowa.tech/remoteEntry.js']],
+  remotes: [
+    ['mymemory', 'https://memory.wiowa.tech/remoteEntry.js'],
+    ['mymotus', 'https://motus.wiowa.tech/remoteEntry.js'],
+  ],
 };
 
 export default {
