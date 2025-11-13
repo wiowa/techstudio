@@ -12,6 +12,7 @@ jobs:
     outputs:
       myhost-affected: ${{ steps.affected.outputs.myhost }}
       mymemory-affected: ${{ steps.affected.outputs.mymemory }}
+      mymotus-affected: ${{ steps.affected.outputs.mymotus }}
 
     steps:
       - name: Checkout repository
@@ -56,6 +57,14 @@ jobs:
             echo "⏭️  mymemory is not affected"
           fi
 
+          if echo "$AFFECTED" | grep -q "mymotus"; then
+            echo "mymotus=true" >> $GITHUB_OUTPUT
+            echo "✅ mymotus is affected"
+          else
+            echo "mymotus=false" >> $GITHUB_OUTPUT
+            echo "⏭️  mymotus is not affected"
+          fi
+
   deploy-myhost:
     needs: check-affected
     if: needs.check-affected.outputs.myhost-affected == 'true'
@@ -83,3 +92,17 @@ jobs:
             -H "Content-Type: application/json" \
             "${{ secrets.COOLIFY_URL }}/api/v1/deploy?uuid=${{ secrets.COOLIFY_UUID_MYMEMORY }}&force=true"
           echo "✅ Triggered deployment for mymemory"
+
+  deploy-mymotus:
+    needs: check-affected
+    if: needs.check-affected.outputs.mymotus-affected == 'true'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Trigger Coolify deployment for mymotus
+        run: |
+          curl -X POST \
+            -H "Authorization: Bearer ${{ secrets.COOLIFY_API_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            "${{ secrets.COOLIFY_URL }}/api/v1/deploy?uuid=${{ secrets.COOLIFY_UUID_MYMEMORY }}&force=true"
+          echo "✅ Triggered deployment for mymotus"
