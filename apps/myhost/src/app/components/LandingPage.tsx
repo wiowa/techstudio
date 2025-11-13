@@ -1,135 +1,72 @@
-import { Button, Card, CardContent, CardHeader } from '@wiowa-tech-studio/ui';
+import { Button, Card, CardContent } from '@wiowa-tech-studio/ui';
+import React from 'react';
+const Mymemory = React.lazy(() => import('mymemory/Module'));
+const Mymotus = React.lazy(() => import('mymotus/Module'));
+
+enum Game {
+  MOTUS = 'Motus',
+  MEMORY = 'Memory',
+}
+
+const gameMapping: Record<
+  Game,
+  React.LazyExoticComponent<() => React.ReactElement>
+> = {
+  [Game.MOTUS]: Mymotus,
+  [Game.MEMORY]: Mymemory,
+};
 
 export function LandingPage() {
+  const [game, setGame] = React.useState<Game | ''>('');
+  const SelectedGameComponent = game ? gameMapping[game] : () => null;
   return (
     <div className="min-h-screen bg-primary/5">
       {/* Hero Section */}
-      <section className="container mx-auto px-6 py-20">
-        <div className="text-center">
-          <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
-            <span className="text-primary">Wiowa Tech Studio</span>
-          </h1>
-          <p className="text-xl md:text-2xl text-secondary-foreground mb-8 max-w-3xl mx-auto">
-            Building innovative solutions with cutting-edge technology. We
-            create powerful MFE applications that scale.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button className="bg-gradient-to-r from-secondary to-primary text-secondary px-8 py-3 rounded-lg font-semibold hover:shadow-lg transition-all duration-200 transform hover:scale-105">
-              LETS GO!!
-            </Button>
-            <Button
-              variant={'secondary'}
-              className="border-2 border-secondary-foreground text-secondary-foreground px-8 py-3 rounded-lg font-semibold"
-            >
-              Learn More
-            </Button>
+      {game ? (
+        <Button>
+          <span onClick={() => setGame('')}>Back to Home</span>
+        </Button>
+      ) : (
+        <section className="container mx-auto px-6 py-20">
+          <div className="text-center">
+            <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
+              <span className="text-primary">Wiowa Tech Studio</span>
+            </h1>
+            <p className="text-xl md:text-2xl text-secondary-foreground mb-8 max-w-3xl mx-auto">
+              Building innovative solutions with cutting-edge technology. We
+              create powerful MFE applications that scale.
+            </p>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
-      {/* Features Section */}
-      <section id="about" className="container mx-auto px-6 py-16">
-        <h2 className="text-4xl font-bold text-center text-primary mb-12">
-          What We Do
-        </h2>
-        <div className="grid md:grid-cols-3 gap-8">
-          <Card className="p-8 rounded-xl shadow-md hover:shadow-xl transition-shadow duration-200">
-            <CardHeader>
-              <div className="w-12 h-12 bg-lime-900 rounded-lg flex items-center justify-center mb-4">
-                <svg
-                  className="w-6 h-6 text-lime-700"
-                  fill="none"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-                </svg>
-              </div>
-              <h3 className="text-xl font-semibold text-primary mb-3">
-                Lightning Fast
-              </h3>
-            </CardHeader>
+      {/* Games Section */}
+      {!game && (
+        <section className="container mx-auto px-6 py-10 flex justify-center">
+          <Card
+            className="p-6 cursor-pointer"
+            onClick={() => setGame(Game.MOTUS)}
+          >
             <CardContent>
-              <p className="text-secondary-foreground">
-                Built with modern technologies like React 19 and Rspack for
-                optimal performance.
-              </p>
+              <h3 className="text-2xl font-semibold mb-4">Motus</h3>
             </CardContent>
           </Card>
-
-          <Card className="p-8 rounded-xl shadow-md hover:shadow-xl transition-shadow duration-200">
-            <CardHeader>
-              <div className="w-12 h-12 bg-lime-900 rounded-lg flex items-center justify-center mb-4">
-                <svg
-                  className="w-6 h-6 text-lime-700"
-                  fill="none"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"></path>
-                </svg>
-              </div>
-              <h3 className="text-xl font-semibold text-primary mb-3">
-                Micro-Frontends
-              </h3>
-            </CardHeader>
+          <Card
+            className="p-6 ml-6 cursor-pointer"
+            onClick={() => setGame(Game.MEMORY)}
+          >
             <CardContent>
-              <p className="text-secondary-foreground">
-                Scalable architecture using Module Federation for independent
-                deployments.
-              </p>
+              <h3 className="text-2xl font-semibold mb-4">Memory</h3>
             </CardContent>
           </Card>
+        </section>
+      )}
 
-          <Card className="p-8 rounded-xl shadow-md hover:shadow-xl transition-shadow duration-200">
-            <CardHeader>
-              <div className="w-12 h-12 bg-lime-100 rounded-lg flex items-center justify-center mb-4">
-                <svg
-                  className="w-6 h-6 text-lime-600"
-                  fill="none"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
-                </svg>
-              </div>
-              <h3 className="text-xl font-semibold text-primary mb-3">
-                Type Safe
-              </h3>
-            </CardHeader>
-            <CardContent>
-              <p className="text-secondary-foreground">
-                Full TypeScript support with strict mode for reliable,
-                maintainable code.
-              </p>
-            </CardContent>
-          </Card>
-        </div>
-      </section>
-
-      {/* Contact Section */}
-      <section id="contact" className="container mx-auto px-6 py-16">
-        <div className="bg-gradient-to-r from-primary to-secondary rounded-2xl shadow-xl p-12 text-center text-white">
-          <h2 className="text-4xl font-bold mb-4 text-primary">
-            Ready to Get Started?
-          </h2>
-          <p className="text-xl mb-8 text-secondary">
-            Let's build something amazing together.
-          </p>
-          <Button className="px-8 py-3 rounded-lg font-semibold transition-all duration-200 transform hover:scale-105">
-            Contact Us
-          </Button>
-        </div>
-      </section>
+      {SelectedGameComponent && (
+        <section>
+          <SelectedGameComponent />
+        </section>
+      )}
     </div>
   );
 }

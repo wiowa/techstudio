@@ -4,6 +4,7 @@ import LandingPage from './components/LandingPage';
 import Topbar from './components/Topbar';
 
 const Mymemory = React.lazy(() => import('mymemory/Module'));
+const Mymotus = React.lazy(() => import('mymotus/Module'));
 
 export function App() {
   return (
@@ -19,6 +20,7 @@ export function App() {
         <Routes>
           <Route path="/" element={<LandingPage />} />
           <Route path="/mymemory" element={<Mymemory />} />
+          <Route path="/mymotus" element={<Mymotus />} />
         </Routes>
       </React.Suspense>
     </div>

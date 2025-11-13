@@ -33,6 +33,12 @@ export function Topbar() {
             >
               Memory
             </Link>
+            <Link
+              to="/mymotus"
+              className="hover:text-muted-foreground transition-colors duration-200"
+            >
+              Motus
+            </Link>
             <a
               href="#about"
               className="hover:text-muted-foreground transition-colors duration-200"
@@ -72,6 +78,10 @@ export function Topbar() {
               <DropdownMenuSeparator />
               <DropdownMenuItem>
                 <Link to={'/mymemory'}>Memory</Link>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem>
+                <Link to={'/mymotus'}>Motus</Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem>About</DropdownMenuItem>

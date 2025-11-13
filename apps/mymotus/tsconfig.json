@@ -6,12 +6,6 @@
       "path": "../../libs/shared/ui"
     },
     {
-      "path": "../mymotus"
-    },
-    {
-      "path": "../mymemory"
-    },
-    {
       "path": "./tsconfig.app.json"
     },
     {
