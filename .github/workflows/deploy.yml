@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - develop
   workflow_dispatch:
 
 jobs:
@@ -71,13 +72,35 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Determine environment and UUID
+        id: env
+        run: |
+          if [ "${{ github.ref_name }}" = "develop" ]; then
+            echo "environment=STA"
+            echo "uuid=${{ secrets.COOLIFY_UUID_MYHOST_STA }}"
+            echo "uuid=${{ secrets.COOLIFY_UUID_MYHOST_STA }}" >> $GITHUB_OUTPUT
+          else
+            echo "environment=Production"
+            echo "uuid=${{ secrets.COOLIFY_UUID_MYHOST }}"
+            echo "uuid=${{ secrets.COOLIFY_UUID_MYHOST }}" >> $GITHUB_OUTPUT
+          fi
+
       - name: Trigger Coolify deployment for myhost
         run: |
+          BRANCH="${{ github.ref_name }}"
+          if [ "$BRANCH" = "develop" ]; then
+            ENV_NAME="STA"
+            UUID="${{ secrets.COOLIFY_UUID_MYHOST_STA }}"
+          else
+            ENV_NAME="Production"
+            UUID="${{ secrets.COOLIFY_UUID_MYHOST }}"
+          fi
+
           curl -X POST \
             -H "Authorization: Bearer ${{ secrets.COOLIFY_API_TOKEN }}" \
             -H "Content-Type: application/json" \
-            "${{ secrets.COOLIFY_URL }}/api/v1/deploy?uuid=${{ secrets.COOLIFY_UUID_MYHOST }}&force=true"
-          echo "✅ Triggered deployment for myhost"
+            "${{ secrets.COOLIFY_URL }}/api/v1/deploy?uuid=$UUID&force=true"
+          echo "✅ Triggered deployment for myhost ($ENV_NAME)"
 
   deploy-mymemory:
     needs: check-affected
@@ -87,11 +110,20 @@ jobs:
     steps:
       - name: Trigger Coolify deployment for mymemory
         run: |
+          BRANCH="${{ github.ref_name }}"
+          if [ "$BRANCH" = "develop" ]; then
+            ENV_NAME="STA"
+            UUID="${{ secrets.COOLIFY_UUID_MYMEMORY_STA }}"
+          else
+            ENV_NAME="Production"
+            UUID="${{ secrets.COOLIFY_UUID_MYMEMORY }}"
+          fi
+
           curl -X POST \
             -H "Authorization: Bearer ${{ secrets.COOLIFY_API_TOKEN }}" \
             -H "Content-Type: application/json" \
-            "${{ secrets.COOLIFY_URL }}/api/v1/deploy?uuid=${{ secrets.COOLIFY_UUID_MYMEMORY }}&force=true"
-          echo "✅ Triggered deployment for mymemory"
+            "${{ secrets.COOLIFY_URL }}/api/v1/deploy?uuid=$UUID&force=true"
+          echo "✅ Triggered deployment for mymemory ($ENV_NAME)"
 
   deploy-mymotus:
     needs: check-affected
@@ -101,8 +133,17 @@ jobs:
     steps:
       - name: Trigger Coolify deployment for mymotus
         run: |
+          BRANCH="${{ github.ref_name }}"
+          if [ "$BRANCH" = "develop" ]; then
+            ENV_NAME="STA"
+            UUID="${{ secrets.COOLIFY_UUID_MYMOTUS_STA }}"
+          else
+            ENV_NAME="Production"
+            UUID="${{ secrets.COOLIFY_UUID_MYMOTUS }}"
+          fi
+
           curl -X POST \
             -H "Authorization: Bearer ${{ secrets.COOLIFY_API_TOKEN }}" \
             -H "Content-Type: application/json" \
-            "${{ secrets.COOLIFY_URL }}/api/v1/deploy?uuid=${{ secrets.COOLIFY_UUID_MYMOTUS }}&force=true"
-          echo "✅ Triggered deployment for mymotus"
+            "${{ secrets.COOLIFY_URL }}/api/v1/deploy?uuid=$UUID&force=true"
+          echo "✅ Triggered deployment for mymotus ($ENV_NAME)"
