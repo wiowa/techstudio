@@ -14,8 +14,11 @@
     "build": {
       "dependsOn": ["^build", "typecheck"],
       "configurations": {
+        "staging": {
+          "args": ["--config=./rspack.config.sta.ts"]
+        },
         "production": {
-          "args": ["--config=./rspack.config.prod.ts"]
+          "args": ["--config=./rspack.config.prd.ts"]
         }
       }
     }
