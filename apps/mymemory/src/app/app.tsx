@@ -1,5 +1,6 @@
 import { Button, Card, CardContent } from '@wiowa-tech-studio/ui';
 import { useEffect, useState } from 'react';
+import { InstallPWA } from '../components/InstallPWA';
 import '../styles.css';
 
 type GameCard = {
@@ -166,6 +167,7 @@ export function App() {
 
   return (
     <div className="min-h-screen max-h-screen bg-background py-8 px-4">
+      <InstallPWA />
       <div className="container mx-auto max-w-5xl">
         {/* Mode Selection */}
         {!gameMode && (
