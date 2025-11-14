@@ -12,7 +12,7 @@ type GameCard = {
 
 type GameMode = 'single' | 'two-player';
 
-type GridSize = '4x4' | '6x6' | '12x12';
+type GridSize = '4x4' | '6x6' | '8x8';
 
 type GridConfig = {
   size: GridSize;
@@ -40,7 +40,7 @@ const SYMBOLS = [
 const GRID_CONFIGS: Record<GridSize, GridConfig> = {
   '4x4': { size: '4x4', columns: 4, pairCount: 8 },
   '6x6': { size: '6x6', columns: 6, pairCount: 18 },
-  '12x12': { size: '12x12', columns: 12, pairCount: 72 },
+  '8x8': { size: '8x8', columns: 8, pairCount: 32 },
 };
 
 export function App() {
@@ -195,7 +195,7 @@ export function App() {
                   Select Grid Size
                 </p>
                 <div className="flex justify-center gap-4 flex-wrap">
-                  {(['4x4', '6x6', '12x12'] as GridSize[]).map((size) => (
+                  {(['4x4', '6x6', '8x8'] as GridSize[]).map((size) => (
                     <Button
                       key={size}
                       onClick={() => setGridSize(size)}
@@ -329,7 +329,7 @@ export function App() {
                     `}
                   >
                     <CardContent className={`flex items-center justify-center h-full p-0 font-bold ${
-                      gridSize === '12x12' ? 'text-xl' : gridSize === '6x6' ? 'text-4xl' : 'text-5xl'
+                      gridSize === '8x8' ? 'text-2xl' : gridSize === '6x6' ? 'text-4xl' : 'text-5xl'
                     }`}>
                       {card.isFlipped || card.isMatched ? card.symbol : '?'}
                     </CardContent>
