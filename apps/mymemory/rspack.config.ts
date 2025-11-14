@@ -21,6 +21,12 @@ export default {
   output: {
     path: join(__dirname, 'dist'),
     publicPath: 'auto',
+    filename: (pathData) => {
+      // Don't hash the service worker filename
+      return pathData.chunk?.name === 'service-worker'
+        ? 'service-worker.js'
+        : '[name].[contenthash].js';
+    },
   },
   devServer: {
     port: 4201,
@@ -43,11 +49,6 @@ export default {
         './src/favicon.ico',
         './src/assets',
         './src/manifest.json',
-        {
-          glob: 'service-worker.ts',
-          input: './src',
-          output: '/',
-        },
       ],
       styles: ['./src/styles.css'],
       outputHashing: process.env['NODE_ENV'] === 'production' ? 'all' : 'none',
