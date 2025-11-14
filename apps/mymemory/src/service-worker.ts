@@ -6,8 +6,8 @@ const CACHE_NAME = 'mymemory-v1';
 const urlsToCache = [
   '/',
   '/index.html',
-  '/styles.css',
   '/favicon.ico',
+  '/manifest.json',
 ];
 
 // Install event - cache resources
@@ -15,7 +15,16 @@ self.addEventListener('install', (event: ExtendableEvent) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
       console.log('Opened cache');
-      return cache.addAll(urlsToCache);
+      // Use addAll with error handling for each URL
+      return Promise.all(
+        urlsToCache.map((url) => {
+          return cache.add(url).catch((err) => {
+            console.warn(`Failed to cache ${url}:`, err);
+            // Don't fail the whole installation if one URL fails
+            return Promise.resolve();
+          });
+        })
+      );
     })
   );
   // Force the waiting service worker to become the active service worker
