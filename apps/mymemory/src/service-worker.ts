@@ -2,10 +2,8 @@
 
 declare const self: ServiceWorkerGlobalScope;
 
-const CACHE_NAME = 'mymemory-v1';
+const CACHE_NAME = 'mymemory-v2';
 const urlsToCache = [
-  '/',
-  '/index.html',
   '/favicon.ico',
   '/manifest.json',
 ];
@@ -57,6 +55,24 @@ self.addEventListener('fetch', (event: FetchEvent) => {
     return;
   }
 
+  const url = new URL(event.request.url);
+
+  // Network-first strategy for index.html and root path
+  if (url.pathname === '/' || url.pathname === '/index.html') {
+    event.respondWith(
+      fetch(event.request)
+        .then((response) => {
+          return response;
+        })
+        .catch(() => {
+          // Fallback to cache only if network fails
+          return caches.match(event.request);
+        })
+    );
+    return;
+  }
+
+  // Cache-first strategy for other resources
   event.respondWith(
     caches.match(event.request).then((response) => {
       // Cache hit - return response
