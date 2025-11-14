@@ -17,7 +17,7 @@ COPY libs ./libs
 ENV PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
 RUN npm ci --prefer-offline --no-audit
 
-# Build myhost (this will also build dependencies like mymemory if needed)
+# Build mymemory
 RUN npx nx run mymemory:build:production
 
 # Production stage
@@ -34,6 +34,16 @@ RUN echo 'server { \
     index index.html; \
     \
     location / { \
+    # CORS headers for Module Federation \
+    add_header Access-Control-Allow-Origin "https://sta.studio.wiowa.tech" always; \
+    add_header Access-Control-Allow-Methods "GET, POST, OPTIONS" always; \
+    add_header Access-Control-Allow-Headers "Content-Type" always; \
+    \
+    # Handle preflight requests \
+    if ($request_method = OPTIONS) { \
+    return 204; \
+    } \
+    \
     try_files $uri $uri/ /index.html; \
     } \
     \
