@@ -13,4 +13,12 @@ root.render(
 );
 
 // Register service worker for PWA functionality
-serviceWorkerRegistration.register();
+serviceWorkerRegistration.register({
+  onUpdate: (registration) => {
+    // Force immediate update when new service worker is available
+    if (registration.waiting) {
+      registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+      window.location.reload();
+    }
+  },
+});
