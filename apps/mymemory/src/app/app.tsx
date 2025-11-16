@@ -1,6 +1,5 @@
 import { Button, Card, CardContent } from '@wiowa-tech-studio/ui';
 import { useEffect, useState } from 'react';
-import { InstallPWA } from '../components/InstallPWA';
 import '../styles.css';
 
 type GameCard = {
@@ -26,15 +25,78 @@ type Player = {
 };
 
 const SYMBOLS = [
-  '🎮', '🎯', '🎨', '🎭', '🎪', '🎸', '🎺', '🎻',
-  '🎲', '🎰', '🎳', '🎾', '⚽', '🏀', '🏈', '⚾',
-  '🎱', '🏐', '🎬', '🎤', '🎧', '🎼', '🎹', '🥁',
-  '🎷', '🎵', '🎶', '🃏', '🎴', '🀄', '🧩', '🪀',
-  '🪁', '♟️', '🕹️', '🖼️', '🪕', '🪘', '🎙️', '📻',
-  '📺', '📷', '📹', '🎥', '📽️', '🎞️', '📸', '📱',
-  '💻', '⌨️', '🖱️', '🖨️', '💾', '💿', '📀', '🎬',
-  '🎭', '🎪', '🎨', '🎯', '🎱', '🎳', '🎮', '🎰',
-  '🎲', '🧸', '🪆', '🎻', '🥁', '🎺', '🎸', '🎹',
+  '🎮',
+  '🎯',
+  '🎨',
+  '🎭',
+  '🎪',
+  '🎸',
+  '🎺',
+  '🎻',
+  '🎲',
+  '🎰',
+  '🎳',
+  '🎾',
+  '⚽',
+  '🏀',
+  '🏈',
+  '⚾',
+  '🎱',
+  '🏐',
+  '🎬',
+  '🎤',
+  '🎧',
+  '🎼',
+  '🎹',
+  '🥁',
+  '🎷',
+  '🎵',
+  '🎶',
+  '🃏',
+  '🎴',
+  '🀄',
+  '🧩',
+  '🪀',
+  '🪁',
+  '♟️',
+  '🕹️',
+  '🖼️',
+  '🪕',
+  '🪘',
+  '🎙️',
+  '📻',
+  '📺',
+  '📷',
+  '📹',
+  '🎥',
+  '📽️',
+  '🎞️',
+  '📸',
+  '📱',
+  '💻',
+  '⌨️',
+  '🖱️',
+  '🖨️',
+  '💾',
+  '💿',
+  '📀',
+  '🎬',
+  '🎭',
+  '🎪',
+  '🎨',
+  '🎯',
+  '🎱',
+  '🎳',
+  '🎮',
+  '🎰',
+  '🎲',
+  '🧸',
+  '🪆',
+  '🎻',
+  '🥁',
+  '🎺',
+  '🎸',
+  '🎹',
 ];
 
 const GRID_CONFIGS: Record<GridSize, GridConfig> = {
@@ -179,7 +241,7 @@ export function App() {
 
   return (
     <div className="min-h-screen max-h-screen bg-background py-8 px-4">
-      <InstallPWA />
+      {/*<InstallPWA />*/}
       <div className="container mx-auto max-w-5xl">
         {/* Mode Selection */}
         {!gameMode && (
@@ -201,9 +263,10 @@ export function App() {
                       onClick={() => setGridSize(size)}
                       className={`
                         text-secondary-foreground inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus:outline-none focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border border-input shadow-sm h-9 px-4 py-2
-                        ${gridSize === size
-                          ? 'bg-primary text-primary-foreground hover:bg-primary/90'
-                          : 'bg-background hover:bg-accent hover:text-accent-foreground'
+                        ${
+                          gridSize === size
+                            ? 'bg-primary text-primary-foreground hover:bg-primary/90'
+                            : 'bg-background hover:bg-accent hover:text-accent-foreground'
                         }
                       `}
                     >
@@ -259,7 +322,9 @@ export function App() {
                     <div className="text-sm">Moves</div>
                   </Card>
                   <Card className="bg-card backdrop-blur-sm rounded-lg px-6 py-3">
-                    <div className="text-2xl font-bold">{matches}/{GRID_CONFIGS[gridSize].pairCount}</div>
+                    <div className="text-2xl font-bold">
+                      {matches}/{GRID_CONFIGS[gridSize].pairCount}
+                    </div>
                     <div className="text-sm">Matches</div>
                   </Card>
                 </div>
@@ -306,7 +371,7 @@ export function App() {
               <div
                 className="grid gap-3"
                 style={{
-                  gridTemplateColumns: `repeat(${GRID_CONFIGS[gridSize].columns}, minmax(0, 1fr))`
+                  gridTemplateColumns: `repeat(${GRID_CONFIGS[gridSize].columns}, minmax(0, 1fr))`,
                 }}
               >
                 {cards.map((card) => (
@@ -328,9 +393,15 @@ export function App() {
                       active:scale-95
                     `}
                   >
-                    <CardContent className={`flex items-center justify-center h-full p-0 font-bold ${
-                      gridSize === '8x8' ? 'text-2xl' : gridSize === '6x6' ? 'text-4xl' : 'text-5xl'
-                    }`}>
+                    <CardContent
+                      className={`flex items-center justify-center h-full p-0 font-bold ${
+                        gridSize === '8x8'
+                          ? 'text-2xl'
+                          : gridSize === '6x6'
+                          ? 'text-4xl'
+                          : 'text-5xl'
+                      }`}
+                    >
                       {card.isFlipped || card.isMatched ? card.symbol : '?'}
                     </CardContent>
                   </Card>
