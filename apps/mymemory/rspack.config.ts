@@ -14,9 +14,19 @@ export default {
       '@wiowa-tech-studio/ui': join(__dirname, '../../libs/shared/ui/src'),
     },
   },
+  entry: {
+    main: './src/main.ts',
+    'service-worker': './src/service-worker.ts',
+  },
   output: {
     path: join(__dirname, 'dist'),
     publicPath: 'auto',
+    filename: (pathData) => {
+      // Don't hash the service worker filename
+      return pathData.chunk?.name === 'service-worker'
+        ? 'service-worker.js'
+        : '[name].[contenthash].js';
+    },
   },
   devServer: {
     port: 4201,
@@ -35,7 +45,11 @@ export default {
       main: './src/main.ts',
       index: './src/index.html',
       baseHref: '/',
-      assets: ['./src/favicon.ico', './src/assets'],
+      assets: [
+        './src/favicon.ico',
+        './src/assets',
+        './src/manifest.json',
+      ],
       styles: ['./src/styles.css'],
       outputHashing: process.env['NODE_ENV'] === 'production' ? 'all' : 'none',
       optimization: process.env['NODE_ENV'] === 'production',

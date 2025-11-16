@@ -11,6 +11,14 @@ type GameCard = {
 
 type GameMode = 'single' | 'two-player';
 
+type GridSize = '4x4' | '6x6' | '8x8';
+
+type GridConfig = {
+  size: GridSize;
+  columns: number;
+  pairCount: number;
+};
+
 type Player = {
   name: string;
   score: number;
@@ -35,10 +43,71 @@ const SYMBOLS = [
   '⚾',
   '🎱',
   '🏐',
+  '🎬',
+  '🎤',
+  '🎧',
+  '🎼',
+  '🎹',
+  '🥁',
+  '🎷',
+  '🎵',
+  '🎶',
+  '🃏',
+  '🎴',
+  '🀄',
+  '🧩',
+  '🪀',
+  '🪁',
+  '♟️',
+  '🕹️',
+  '🖼️',
+  '🪕',
+  '🪘',
+  '🎙️',
+  '📻',
+  '📺',
+  '📷',
+  '📹',
+  '🎥',
+  '📽️',
+  '🎞️',
+  '📸',
+  '📱',
+  '💻',
+  '⌨️',
+  '🖱️',
+  '🖨️',
+  '💾',
+  '💿',
+  '📀',
+  '🎬',
+  '🎭',
+  '🎪',
+  '🎨',
+  '🎯',
+  '🎱',
+  '🎳',
+  '🎮',
+  '🎰',
+  '🎲',
+  '🧸',
+  '🪆',
+  '🎻',
+  '🥁',
+  '🎺',
+  '🎸',
+  '🎹',
 ];
+
+const GRID_CONFIGS: Record<GridSize, GridConfig> = {
+  '4x4': { size: '4x4', columns: 4, pairCount: 8 },
+  '6x6': { size: '6x6', columns: 6, pairCount: 18 },
+  '8x8': { size: '8x8', columns: 8, pairCount: 32 },
+};
 
 export function App() {
   const [gameMode, setGameMode] = useState<GameMode | null>(null);
+  const [gridSize, setGridSize] = useState<GridSize>('6x6');
   const [cards, setCards] = useState<GameCard[]>([]);
   const [flippedCards, setFlippedCards] = useState<number[]>([]);
   const [moves, setMoves] = useState(0);
@@ -52,8 +121,10 @@ export function App() {
   const [isVibrating, setIsVibrating] = useState(false);
 
   // Initialize game
-  const initializeGame = (mode?: GameMode) => {
-    const gameSymbols = SYMBOLS.slice(0, 18); // 18 pairs for 6x6 grid
+  const initializeGame = (mode?: GameMode, size?: GridSize) => {
+    const selectedSize = size || gridSize;
+    const config = GRID_CONFIGS[selectedSize];
+    const gameSymbols = SYMBOLS.slice(0, config.pairCount);
     const shuffledCards = [...gameSymbols, ...gameSymbols]
       .sort(() => Math.random() - 0.5)
       .map((symbol, index) => ({
@@ -76,6 +147,9 @@ export function App() {
     setIsVibrating(false);
     if (mode) {
       setGameMode(mode);
+    }
+    if (size) {
+      setGridSize(size);
     }
   };
 
@@ -141,10 +215,11 @@ export function App() {
 
   // Check if game is complete
   useEffect(() => {
-    if (matches === 18 && cards.length > 0) {
+    const config = GRID_CONFIGS[gridSize];
+    if (matches === config.pairCount && cards.length > 0) {
       setIsGameComplete(true);
     }
-  }, [matches, cards]);
+  }, [matches, cards, gridSize]);
 
   const handleCardClick = (id: number) => {
     const card = cards.find((c) => c.id === id);
@@ -166,15 +241,43 @@ export function App() {
 
   return (
     <div className="min-h-screen max-h-screen bg-background py-8 px-4">
+      {/*<InstallPWA />*/}
       <div className="container mx-auto max-w-5xl">
         {/* Mode Selection */}
         {!gameMode && (
           <div className="flex items-center justify-center min-h-[70vh]">
-            <Card className="bg-card text-card-foreground backdrop-blur-md rounded-2xl shadow-2xl p-12 text-center">
+            <Card className="bg-card text-card-foreground backdrop-blur-md rounded-2xl shadow-2xl p-12 text-center max-w-2xl">
               <h1 className="text-5xl font-bold text-primary mb-4 drop-shadow-lg">
                 Memory Game
               </h1>
-              <p className="text-xl text-secondary-foreground mb-8">
+
+              {/* Grid Size Selection */}
+              <div className="mb-8">
+                <p className="text-xl text-secondary-foreground mb-4">
+                  Select Grid Size
+                </p>
+                <div className="flex justify-center gap-4 flex-wrap">
+                  {(['4x4', '6x6', '8x8'] as GridSize[]).map((size) => (
+                    <Button
+                      key={size}
+                      onClick={() => setGridSize(size)}
+                      className={`
+                        text-secondary-foreground inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus:outline-none focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border border-input shadow-sm h-9 px-4 py-2
+                        ${
+                          gridSize === size
+                            ? 'bg-primary text-primary-foreground hover:bg-primary/90'
+                            : 'bg-background hover:bg-accent hover:text-accent-foreground'
+                        }
+                      `}
+                    >
+                      {size} ({GRID_CONFIGS[size].pairCount} pairs)
+                    </Button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Game Mode Selection */}
+              <p className="text-xl text-secondary-foreground mb-4">
                 Select Game Mode
               </p>
               <div className="flex flex-col gap-4">
@@ -208,7 +311,7 @@ export function App() {
               <p className="text-xl text-secondary-foreground mb-6">
                 {gameMode === 'two-player'
                   ? `${players[currentPlayer].name}'s Turn`
-                  : 'Match all 18 pairs to win!'}
+                  : `Match all ${GRID_CONFIGS[gridSize].pairCount} pairs to win!`}
               </p>
 
               {/* Stats */}
@@ -219,7 +322,9 @@ export function App() {
                     <div className="text-sm">Moves</div>
                   </Card>
                   <Card className="bg-card backdrop-blur-sm rounded-lg px-6 py-3">
-                    <div className="text-2xl font-bold">{matches}/18</div>
+                    <div className="text-2xl font-bold">
+                      {matches}/{GRID_CONFIGS[gridSize].pairCount}
+                    </div>
                     <div className="text-sm">Matches</div>
                   </Card>
                 </div>
@@ -263,7 +368,12 @@ export function App() {
                 isVibrating ? 'vibrate' : ''
               }`}
             >
-              <div className="grid grid-cols-6 gap-3">
+              <div
+                className="grid gap-3"
+                style={{
+                  gridTemplateColumns: `repeat(${GRID_CONFIGS[gridSize].columns}, minmax(0, 1fr))`,
+                }}
+              >
                 {cards.map((card) => (
                   <Card
                     key={card.id}
@@ -283,7 +393,15 @@ export function App() {
                       active:scale-95
                     `}
                   >
-                    <CardContent className="flex items-center justify-center h-full p-0 text-4xl font-bold">
+                    <CardContent
+                      className={`flex items-center justify-center h-full p-0 font-bold ${
+                        gridSize === '8x8'
+                          ? 'text-2xl'
+                          : gridSize === '6x6'
+                          ? 'text-4xl'
+                          : 'text-5xl'
+                      }`}
+                    >
                       {card.isFlipped || card.isMatched ? card.symbol : '?'}
                     </CardContent>
                   </Card>

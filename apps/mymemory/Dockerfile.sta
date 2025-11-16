@@ -26,25 +26,57 @@ FROM nginx:alpine
 # Copy built application
 COPY --from=builder /app/apps/mymemory/dist /usr/share/nginx/html
 
-# Create nginx configuration for SPA
+# Create nginx configuration for SPA with PWA support
 RUN echo 'server { \
     listen 80; \
     server_name _; \
     root /usr/share/nginx/html; \
     index index.html; \
     \
-    location / { \
-    # CORS headers for Module Federation \
-    add_header Access-Control-Allow-Origin "https://sta.studio.wiowa.tech" always; \
-    add_header Access-Control-Allow-Methods "GET, POST, OPTIONS" always; \
-    add_header Access-Control-Allow-Headers "Content-Type" always; \
-    \
-    # Handle preflight requests \
-    if ($request_method = OPTIONS) { \
-    return 204; \
+    # Service Worker - no cache, must revalidate \
+    location ~ ^/service-worker\..*\.js$ { \
+        add_header Cache-Control "no-cache, no-store, must-revalidate"; \
+        add_header Pragma "no-cache"; \
+        add_header Expires "0"; \
+        add_header Service-Worker-Allowed "/"; \
+        add_header Access-Control-Allow-Origin "https://sta.studio.wiowa.tech" always; \
+        try_files $uri =404; \
     } \
     \
-    try_files $uri $uri/ /index.html; \
+    # Web App Manifest \
+    location = /manifest.json { \
+        add_header Cache-Control "public, max-age=3600"; \
+        add_header Content-Type "application/manifest+json"; \
+        add_header Access-Control-Allow-Origin "https://sta.studio.wiowa.tech" always; \
+        try_files $uri =404; \
+    } \
+    \
+    # PWA Icons - cache for 1 week \
+    location ~* ^/assets/icons/.*\.(png|jpg|jpeg|svg|ico)$ { \
+        add_header Cache-Control "public, max-age=604800, immutable"; \
+        add_header Access-Control-Allow-Origin "https://sta.studio.wiowa.tech" always; \
+        try_files $uri =404; \
+    } \
+    \
+    # Static assets - cache for 1 year \
+    location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$ { \
+        add_header Cache-Control "public, max-age=31536000, immutable"; \
+        add_header Access-Control-Allow-Origin "https://sta.studio.wiowa.tech" always; \
+        try_files $uri =404; \
+    } \
+    \
+    location / { \
+        # CORS headers for Module Federation \
+        add_header Access-Control-Allow-Origin "https://sta.studio.wiowa.tech" always; \
+        add_header Access-Control-Allow-Methods "GET, POST, OPTIONS" always; \
+        add_header Access-Control-Allow-Headers "Content-Type" always; \
+        \
+        # Handle preflight requests \
+        if ($request_method = OPTIONS) { \
+            return 204; \
+        } \
+        \
+        try_files $uri $uri/ /index.html; \
     } \
     \
     # Enable gzip compression \
