@@ -73,7 +73,16 @@ self.addEventListener('fetch', (event: FetchEvent) => {
         })
         .catch(() => {
           // Fallback to cache only if network fails
-          return caches.match(event.request);
+          return caches.match(event.request).then((cachedResponse) => {
+            if (cachedResponse) {
+              return cachedResponse;
+            }
+            // Return a basic offline response if no cache available
+            return new Response('Offline', {
+              status: 503,
+              statusText: 'Service Unavailable',
+            });
+          });
         })
     );
     return;
