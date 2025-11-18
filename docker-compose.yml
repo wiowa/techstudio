@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: wiowa-postgres
+    restart: unless-stopped
+    ports:
+      - '5433:5432'
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: studio
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - wiowa-network
+
+  # Optional: PgAdmin for database management
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: wiowa-pgadmin
+    restart: unless-stopped
+    ports:
+      - '5050:80'
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@wiowa.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    networks:
+      - wiowa-network
+    depends_on:
+      - postgres
+
+volumes:
+  postgres-data:
+
+networks:
+  wiowa-network:
+    driver: bridge
