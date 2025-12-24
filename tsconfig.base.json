@@ -18,6 +18,7 @@
     "target": "es2022",
     "customConditions": ["@wiowa-tech-studio/source"],
     "paths": {
+      "@wiowa-tech-studio/mymemory-core": ["libs/shared/mymemory-core/src/index.ts"],
       "@wiowa-tech-studio/ui": ["libs/shared/ui/src/index.ts"],
       "@wiowa-tech-studio/ui/components": [
         "libs/shared/ui/src/components/index.ts"
