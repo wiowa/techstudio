@@ -509,7 +509,7 @@ export function App() {
 
             {/* Game Board */}
             <div
-              className={`bg-white/10 backdrop-blur-md rounded-2xl shadow-2xl ${
+              className={`bg-white/10 backdrop-blur-md rounded-2xl shadow-2xl flex items-center justify-center ${
                 isVibrating ? 'vibrate' : ''
               }`}
               style={{
@@ -519,8 +519,9 @@ export function App() {
               <div
                 className="grid"
                 style={{
-                  gridTemplateColumns: `repeat(${GRID_CONFIGS[gridSize].columns}, minmax(0, 1fr))`,
+                  gridTemplateColumns: `repeat(${GRID_CONFIGS[gridSize].columns}, ${cardSize}px)`,
                   gap: isMobile ? '0.25rem' : '0.75rem',
+                  maxWidth: '100%',
                 }}
               >
                 {cards.map((card) => (
@@ -541,10 +542,6 @@ export function App() {
                       }
                       active:scale-95
                     `}
-                    style={{
-                      maxHeight: cardSize > 0 ? `${cardSize}px` : undefined,
-                      maxWidth: cardSize > 0 ? `${cardSize}px` : undefined,
-                    }}
                   >
                     <CardContent
                       className={`flex items-center justify-center h-full p-0 font-bold ${
