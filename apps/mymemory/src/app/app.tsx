@@ -341,7 +341,7 @@ export function App() {
   };
 
   return (
-    <div className="min-h-screen max-h-screen bg-background py-8 px-4">
+    <div className="min-h-screen max-h-screen bg-background py-8 px-4 overflow-x-hidden">
       {/*<InstallPWA />*/}
       <div className="container mx-auto max-w-5xl">
         {/* Mode Selection */}

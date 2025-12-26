@@ -42,7 +42,9 @@ export function useCardSize(gridSize: GridSize) {
       const optimalHeightSize = (availableHeight - totalGapVertical) / rows;
 
       // Calculate based on WIDTH
-      const availableWidth = vw - (containerPadding * 2) - 32; // 32px for container margins
+      // Account for: container px-4 (32px) + board padding (24px or 64px) + safety margin (16px)
+      const horizontalMargins = mobile ? 72 : 112; // More conservative calculation
+      const availableWidth = vw - horizontalMargins;
       const optimalWidthSize = (availableWidth - totalGapHorizontal) / cols;
 
       // Use the minimum of both to ensure it fits
