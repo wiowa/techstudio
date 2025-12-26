@@ -27,19 +27,26 @@ export function useCardSize(gridSize: GridSize) {
       // Header space estimation (title + stats + buttons)
       const headerSpace = mobile ? 280 : 350;
 
-      // Padding: p-3 (mobile) = 12px top + 12px bottom, p-8 (desktop) = 32px top + 32px bottom
-      const containerPadding = mobile ? 24 : 64;
+      // Padding: 0.75rem (mobile) = 12px, 2rem (desktop) = 32px
+      const containerPadding = mobile ? 12 : 32;
 
-      // Gap between cards: gap-1 (mobile) = 4px, gap-3 (desktop) = 12px
+      // Gap between cards: 0.25rem (mobile) = 4px, 0.75rem (desktop) = 12px
       const gapSize = mobile ? 4 : 12;
       const rows = GRID_ROWS[gridSize];
-      const totalGap = gapSize * (rows - 1);
+      const cols = GRID_ROWS[gridSize]; // Square grid
+      const totalGapVertical = gapSize * (rows - 1);
+      const totalGapHorizontal = gapSize * (cols - 1);
 
-      // Available height for the grid
-      const availableHeight = vh - headerSpace - containerPadding;
+      // Calculate based on HEIGHT
+      const availableHeight = vh - headerSpace - (containerPadding * 2);
+      const optimalHeightSize = (availableHeight - totalGapVertical) / rows;
 
-      // Calculate optimal card size
-      const optimalSize = (availableHeight - totalGap) / rows;
+      // Calculate based on WIDTH
+      const availableWidth = vw - (containerPadding * 2) - 32; // 32px for container margins
+      const optimalWidthSize = (availableWidth - totalGapHorizontal) / cols;
+
+      // Use the minimum of both to ensure it fits
+      const optimalSize = Math.min(optimalHeightSize, optimalWidthSize);
 
       // Set minimum card size to ensure playability
       const minCardSize = mobile ? 40 : 60;
