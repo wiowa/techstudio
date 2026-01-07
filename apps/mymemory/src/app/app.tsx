@@ -1,13 +1,19 @@
 import { Button, Card, CardContent } from '@wiowa-tech-studio/ui';
 import { useEffect, useState } from 'react';
 import '../styles.css';
-import { useMatchLogic } from '../hooks/useMatchLogic';
-import type { MatchConfig, Player as MatchPlayer, RoundResult } from '../types/match';
-import { MatchConfigScreen } from '../components/MatchConfigScreen';
-import { MatchScoreboard } from '../components/MatchScoreboard';
-import { BetweenRoundsScreen } from '../components/BetweenRoundsScreen';
-import { MatchCompleteModal } from '../components/MatchCompleteModal';
-import { useCardSize, getRecommendedGridSize } from '../hooks/useCardSize';
+import {
+  useMatchLogic,
+  useCardSize,
+  getRecommendedGridSize,
+  MatchConfigScreen,
+  MatchScoreboard,
+  BetweenRoundsScreen,
+  MatchCompleteModal,
+  type MatchConfig,
+  type Player as MatchPlayer,
+  type RoundResult,
+  type GridSize,
+} from '@wiowa-tech-studio/mymemory-core';
 
 type GameCard = {
   id: number;
@@ -17,8 +23,6 @@ type GameCard = {
 };
 
 type GameMode = 'single' | 'two-player' | 'two-player-match';
-
-export type GridSize = '4x4' | '6x6' | '8x8';
 
 type GridConfig = {
   size: GridSize;
