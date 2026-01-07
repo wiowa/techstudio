@@ -6,7 +6,6 @@ import {
   Patch,
   Param,
   Delete,
-  UseGuards,
   ClassSerializerInterceptor,
   UseInterceptors,
 } from '@nestjs/common';

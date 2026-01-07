@@ -1,28 +1,27 @@
 import {
-  Controller,
-  Post,
   Body,
-  UseGuards,
+  ClassSerializerInterceptor,
+  Controller,
   Get,
-  Query,
-  Req,
   HttpCode,
   HttpStatus,
-  ClassSerializerInterceptor,
+  Post,
+  Query,
+  Req,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { Request } from 'express';
-import { AuthService } from './auth.service';
-import { RegisterDto } from './dto/register.dto';
-import { LoginDto } from './dto/login.dto';
-import { RefreshTokenDto } from './dto/refresh-token.dto';
-import { ForgotPasswordDto } from './dto/forgot-password.dto';
-import { ResetPasswordDto } from './dto/reset-password.dto';
-import { LocalAuthGuard } from './guards/local-auth.guard';
-import { JwtAuthGuard } from './guards/jwt-auth.guard';
-import { Public } from './decorators/public.decorator';
-import { CurrentUser } from './decorators/current-user.decorator';
+import type { Request } from 'express';
 import { User } from '../users/entities/user.entity';
+import { AuthService } from './auth.service';
+import { CurrentUser } from './decorators/current-user.decorator';
+import { Public } from './decorators/public.decorator';
+import { ForgotPasswordDto } from './dto/forgot-password.dto';
+import { RefreshTokenDto } from './dto/refresh-token.dto';
+import { RegisterDto } from './dto/register.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { LocalAuthGuard } from './guards/local-auth.guard';
 
 @Controller('auth')
 @UseInterceptors(ClassSerializerInterceptor)
@@ -49,7 +48,10 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   async refresh(@Body() refreshTokenDto: RefreshTokenDto, @Req() req: Request) {
     const ip = req.ip || req.socket.remoteAddress || 'unknown';
-    return await this.authService.refreshTokens(refreshTokenDto.refreshToken, ip);
+    return await this.authService.refreshTokens(
+      refreshTokenDto.refreshToken,
+      ip
+    );
   }
 
   @Post('logout')

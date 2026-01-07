@@ -13,14 +13,14 @@ import type { RefreshToken } from '../../auth/entities/refresh-token.entity';
 @Entity('users')
 export class User {
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  id!: string;
 
   @Column({ unique: true })
-  email: string;
+  email!: string;
 
   @Column()
   @Exclude() // Don't expose password in responses
-  password: string;
+  password!: string;
 
   @Column({ nullable: true })
   firstName?: string;
@@ -29,10 +29,10 @@ export class User {
   lastName?: string;
 
   @Column({ type: 'enum', enum: UserRole, default: UserRole.USER })
-  role: UserRole;
+  role!: UserRole;
 
   @Column({ default: false })
-  isEmailVerified: boolean;
+  isEmailVerified!: boolean;
 
   @Column({ nullable: true })
   @Exclude()
@@ -49,17 +49,17 @@ export class User {
   passwordResetExpires?: Date;
 
   @Column({ default: true })
-  isActive: boolean;
+  isActive!: boolean;
 
   @Column({ type: 'timestamp', nullable: true })
   lastLoginAt?: Date;
 
   @CreateDateColumn()
-  createdAt: Date;
+  createdAt!: Date;
 
   @UpdateDateColumn()
-  updatedAt: Date;
+  updatedAt!: Date;
 
-  @OneToMany(() => 'RefreshToken', (token: RefreshToken) => token.user)
-  refreshTokens: RefreshToken[];
+  @OneToMany('RefreshToken', (token: RefreshToken) => token.user)
+  refreshTokens!: RefreshToken[];
 }

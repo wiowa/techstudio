@@ -132,8 +132,8 @@ export class UsersService {
     }
 
     user.isEmailVerified = true;
-    user.emailVerificationToken = null;
-    user.emailVerificationExpires = null;
+    user.emailVerificationToken = undefined;
+    user.emailVerificationExpires = undefined;
 
     return await this.userRepository.save(user);
   }
@@ -165,8 +165,8 @@ export class UsersService {
     const hashedPassword = await this.hashPassword(newPassword);
 
     user.password = hashedPassword;
-    user.passwordResetToken = null;
-    user.passwordResetExpires = null;
+    user.passwordResetToken = undefined;
+    user.passwordResetExpires = undefined;
 
     return await this.userRepository.save(user);
   }

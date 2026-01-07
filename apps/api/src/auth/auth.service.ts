@@ -1,13 +1,10 @@
-import {
-  Injectable,
-  UnauthorizedException,
-  BadRequestException,
-} from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, LessThan } from 'typeorm';
 import { ConfigService } from '@nestjs/config';
 import { randomBytes } from 'crypto';
+import type { StringValue } from 'ms';
 import { User } from '../users/entities/user.entity';
 import { UsersService } from '../users/users.service';
 import { RefreshToken } from './entities/refresh-token.entity';
@@ -202,7 +199,7 @@ export class AuthService {
 
     return this.jwtService.sign(payload, {
       secret: this.configService.get<string>('JWT_SECRET'),
-      expiresIn: this.configService.get<string>('JWT_EXPIRATION', '15m'),
+      expiresIn: this.configService.get<string>('JWT_EXPIRATION', '15m') as StringValue,
     });
   }
 

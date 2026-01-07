@@ -11,23 +11,23 @@ import { User } from '../../users/entities/user.entity';
 @Entity('refresh_tokens')
 export class RefreshToken {
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  id!: string;
 
   @Column({ unique: true })
-  token: string;
+  token!: string;
 
   @ManyToOne(() => User, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'userId' })
-  user: User;
+  user!: User;
 
   @Column()
-  userId: string;
+  userId!: string;
 
   @Column({ type: 'timestamp' })
-  expiresAt: Date;
+  expiresAt!: Date;
 
   @Column({ default: false })
-  isRevoked: boolean;
+  isRevoked!: boolean;
 
   @Column({ nullable: true })
   replacedByToken?: string;
@@ -36,13 +36,13 @@ export class RefreshToken {
   revokedAt?: Date;
 
   @Column()
-  createdByIp: string;
+  createdByIp!: string;
 
   @Column({ nullable: true })
   revokedByIp?: string;
 
   @CreateDateColumn()
-  createdAt: Date;
+  createdAt!: Date;
 
   // Helper methods
   get isExpired(): boolean {
