@@ -3,7 +3,7 @@
  * Visual indicator showing who won each completed round
  */
 
-import type { RoundResult, Player } from '../types/match';
+import type { RoundResult, Player } from '../../types/match';
 
 interface RoundHistoryIndicatorProps {
   roundHistory: RoundResult[];

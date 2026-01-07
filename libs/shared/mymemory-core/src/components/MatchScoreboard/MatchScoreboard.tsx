@@ -4,8 +4,8 @@
  */
 
 import { Card } from '@wiowa-tech-studio/ui';
-import type { MatchState } from '../types/match';
-import { RoundHistoryIndicator } from './RoundHistoryIndicator';
+import type { MatchState } from '../../types/match';
+import { RoundHistoryIndicator } from '../RoundHistoryIndicator';
 
 interface MatchScoreboardProps {
   matchState: MatchState;

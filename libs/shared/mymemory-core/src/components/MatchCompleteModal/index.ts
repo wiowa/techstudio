@@ -1,0 +1,1 @@
+export { MatchCompleteModal } from './MatchCompleteModal';

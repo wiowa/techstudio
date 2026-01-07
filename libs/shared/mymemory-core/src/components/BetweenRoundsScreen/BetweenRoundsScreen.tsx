@@ -5,9 +5,9 @@
 
 import { Button, Card } from '@wiowa-tech-studio/ui';
 import { useState } from 'react';
-import type { RoundResult, MatchState } from '../types/match';
-import type { GridSize } from '../types/game';
-import { RoundHistoryIndicator } from './RoundHistoryIndicator';
+import type { RoundResult, MatchState } from '../../types/match';
+import type { GridSize } from '../../types/game';
+import { RoundHistoryIndicator } from '../RoundHistoryIndicator';
 
 interface BetweenRoundsScreenProps {
   roundResult: RoundResult;

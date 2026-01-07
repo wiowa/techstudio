@@ -5,9 +5,9 @@
 
 import { Button, Card } from '@wiowa-tech-studio/ui';
 import { useState, useEffect } from 'react';
-import type { MatchConfig, Player } from '../types/match';
-import type { GridSize } from '../types/game';
-import { getRecommendedGridSize } from '../hooks/useCardSize';
+import type { MatchConfig, Player } from '../../types/match';
+import type { GridSize } from '../../types/game';
+import { getRecommendedGridSize } from '../../hooks/useCardSize';
 
 interface MatchConfigScreenProps {
   onStartMatch: (config: MatchConfig, players: [Player, Player]) => void;

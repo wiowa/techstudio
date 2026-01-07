@@ -4,7 +4,7 @@
  */
 
 import { Button } from '@wiowa-tech-studio/ui';
-import type { MatchRecord } from '../types/match';
+import type { MatchRecord } from '../../types/match';
 
 interface MatchCompleteModalProps {
   matchRecord: MatchRecord;
