@@ -1,0 +1,1 @@
+export { MatchConfigScreen } from './MatchConfigScreen';

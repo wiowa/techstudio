@@ -13,14 +13,14 @@ describe('App', () => {
     expect(baseElement).toBeTruthy();
   });
 
-  it('should have a greeting as the title', () => {
+  it('should have Wiowa Tech Studio title', () => {
     const { getAllByText } = render(
       <BrowserRouter>
         <App />
       </BrowserRouter>
     );
     expect(
-      getAllByText(new RegExp('Welcome myhost', 'gi')).length > 0
+      getAllByText(new RegExp('Wiowa Tech Studio', 'gi')).length > 0
     ).toBeTruthy();
   });
 });
