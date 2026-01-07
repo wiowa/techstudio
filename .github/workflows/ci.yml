@@ -1,6 +1,10 @@
 name: CI
 
 on:
+  push:
+    branches-ignore:
+      - main
+      - develop
   pull_request:
     branches:
       - main
@@ -31,11 +35,20 @@ jobs:
         env:
           PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: '1'
 
+      - name: Set base ref
+        id: set-base
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            echo "base=origin/${{ github.base_ref }}" >> $GITHUB_OUTPUT
+          else
+            echo "base=origin/develop" >> $GITHUB_OUTPUT
+          fi
+
       - name: Run affected tests
-        run: npx nx affected -t test --base=origin/${{ github.base_ref }} --head=HEAD
+        run: npx nx affected -t test --base=${{ steps.set-base.outputs.base }} --head=HEAD
 
       - name: Run affected lint
-        run: npx nx affected -t lint --base=origin/${{ github.base_ref }} --head=HEAD
+        run: npx nx affected -t lint --base=${{ steps.set-base.outputs.base }} --head=HEAD
 
       - name: Run affected typecheck
-        run: npx nx affected -t typecheck --base=origin/${{ github.base_ref }} --head=HEAD
+        run: npx nx affected -t typecheck --base=${{ steps.set-base.outputs.base }} --head=HEAD
