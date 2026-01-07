@@ -1,2 +1,5 @@
-// TypeScript types will be exported from here
-export {};
+// Core game types
+export * from './game';
+
+// Match mode types
+export * from './match';

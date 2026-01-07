@@ -1,2 +1,4 @@
-// Game logic hooks will be exported from here
-export {};
+// Game logic hooks
+export * from './useCardSize';
+export * from './useLocalStorageMatch';
+export * from './useMatchLogic';
