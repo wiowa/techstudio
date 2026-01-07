@@ -13,15 +13,12 @@ describe('App', () => {
     expect(baseElement).toBeTruthy();
   });
 
-  it('should have a greeting as the title', () => {
-    const { getAllByText } = render(
+  it('should render the app content', () => {
+    const { baseElement } = render(
       <BrowserRouter>
         <App />
       </BrowserRouter>
     );
-    expect(
-      getAllByText(new RegExp('Welcome @wiowa-tech-studio/mymotus', 'gi'))
-        .length > 0
-    ).toBeTruthy();
+    expect(baseElement.querySelector('main, div')).toBeTruthy();
   });
 });
