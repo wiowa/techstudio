@@ -1,0 +1,19 @@
+{
+  "name": "mymemory-mobile",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/mymemory-mobile/src",
+  "projectType": "application",
+  "tags": ["mobile"],
+  "targets": {
+    "build": {
+      "outputs": ["{workspaceRoot}/dist/apps/mymemory-mobile"],
+      "dependsOn": ["^build", "typecheck"]
+    },
+    "serve": {
+      "options": {
+        "port": 4202
+      },
+      "dependsOn": ["typecheck"]
+    }
+  }
+}

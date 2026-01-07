@@ -1,0 +1,40 @@
+/* Import shared theme variables FIRST */
+@import '@wiowa-tech-studio/ui/styles/theme.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* mymemory-specific styles */
+@keyframes vibrate {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  10%,
+  30%,
+  50%,
+  70%,
+  90% {
+    transform: translateX(-5px);
+  }
+  20%,
+  40%,
+  60%,
+  80% {
+    transform: translateX(5px);
+  }
+}
+
+.vibrate {
+  animation: vibrate 0.5s ease-in-out;
+}
