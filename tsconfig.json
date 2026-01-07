@@ -29,6 +29,9 @@
     },
     {
       "path": "./libs/shared/mymemory-core"
+    },
+    {
+      "path": "./apps/mymotus-e2e"
     }
   ]
 }
