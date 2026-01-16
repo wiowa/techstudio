@@ -20,12 +20,12 @@ async function bootstrap() {
   );
 
   // Enable CORS for frontend communication
+  const corsOrigins = process.env.CORS_ORIGINS
+    ? process.env.CORS_ORIGINS.split(',')
+    : ['http://localhost:4200', 'http://localhost:4201', 'http://localhost:4202'];
+
   app.enableCors({
-    origin: [
-      'http://localhost:4200',
-      'http://localhost:4201',
-      'http://localhost:4202',
-    ],
+    origin: corsOrigins,
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization'],
