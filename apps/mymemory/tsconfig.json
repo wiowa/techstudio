@@ -3,6 +3,9 @@
   "include": [],
   "references": [
     {
+      "path": "../../libs/shared/mymemory-core"
+    },
+    {
       "path": "../../libs/shared/ui"
     },
     {
