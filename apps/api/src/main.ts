@@ -1,6 +1,6 @@
 /**
- * This is not a production server yet!
- * This is only a minimal backend to get started.
+ * WiowaTechStudio API
+ * NestJS backend with JWT authentication
  */
 
 import { Logger, ValidationPipe } from '@nestjs/common';
