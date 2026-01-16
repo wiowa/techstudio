@@ -14,13 +14,17 @@ export class JwtRefreshStrategy extends PassportStrategy(
   Strategy,
   'jwt-refresh'
 ) {
-  constructor(private configService: ConfigService) {
+  constructor(configService: ConfigService) {
+    const secret = configService.get<string>('JWT_REFRESH_SECRET');
+    if (!secret) {
+      throw new Error('JWT_REFRESH_SECRET is not defined');
+    }
     super({
       jwtFromRequest: ExtractJwt.fromBodyField('refreshToken'),
       ignoreExpiration: false,
-      secretOrKey: configService.get<string>('JWT_REFRESH_SECRET'),
+      secretOrKey: secret,
       passReqToCallback: true,
-    });
+    } as const);
   }
 
   async validate(req: Request, payload: JwtRefreshPayload) {

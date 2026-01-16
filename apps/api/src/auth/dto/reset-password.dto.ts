@@ -3,7 +3,7 @@ import { IsString, IsNotEmpty, MinLength, Matches } from 'class-validator';
 export class ResetPasswordDto {
   @IsString()
   @IsNotEmpty()
-  token: string;
+  token!: string;
 
   @IsString()
   @MinLength(8, { message: 'Password must be at least 8 characters long' })
@@ -11,5 +11,5 @@ export class ResetPasswordDto {
     message:
       'Password must contain uppercase, lowercase, number and special character',
   })
-  newPassword: string;
+  newPassword!: string;
 }
