@@ -14,6 +14,7 @@ jobs:
       myhost-affected: ${{ steps.affected.outputs.myhost }}
       mymemory-affected: ${{ steps.affected.outputs.mymemory }}
       mymotus-affected: ${{ steps.affected.outputs.mymotus }}
+      api-affected: ${{ steps.affected.outputs.api }}
 
     steps:
       - name: Checkout repository
@@ -64,6 +65,15 @@ jobs:
           else
             echo "mymotus=false" >> $GITHUB_OUTPUT
             echo "⏭️  mymotus is not affected"
+          fi
+
+          # Check if api is affected
+          if echo "$AFFECTED" | grep -q "^api$"; then
+            echo "api=true" >> $GITHUB_OUTPUT
+            echo "✅ api is affected"
+          else
+            echo "api=false" >> $GITHUB_OUTPUT
+            echo "⏭️  api is not affected"
           fi
 
   deploy-myhost:
@@ -147,3 +157,26 @@ jobs:
             -H "Content-Type: application/json" \
             "${{ secrets.COOLIFY_URL }}/api/v1/deploy?uuid=$UUID&force=true"
           echo "✅ Triggered deployment for mymotus ($ENV_NAME)"
+
+  deploy-api:
+    needs: check-affected
+    if: needs.check-affected.outputs.api-affected == 'true'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Trigger Coolify deployment for api
+        run: |
+          BRANCH="${{ github.ref_name }}"
+          if [ "$BRANCH" = "develop" ]; then
+            ENV_NAME="STA"
+            UUID="${{ secrets.COOLIFY_UUID_API_STA }}"
+          else
+            ENV_NAME="Production"
+            UUID="${{ secrets.COOLIFY_UUID_API }}"
+          fi
+
+          curl -X POST \
+            -H "Authorization: Bearer ${{ secrets.COOLIFY_API_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            "${{ secrets.COOLIFY_URL }}/api/v1/deploy?uuid=$UUID&force=true"
+          echo "✅ Triggered deployment for api ($ENV_NAME)"
