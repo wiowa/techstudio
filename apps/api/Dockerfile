@@ -25,7 +25,7 @@ COPY package*.json ./
 RUN npm ci --omit=dev
 
 # Copy built application
-COPY --from=builder /app/dist/apps/api ./dist
+COPY --from=builder /app/apps/api/dist ./dist
 
 # Expose port
 EXPOSE 3333
