@@ -1,13 +1,11 @@
 /**
  * MatchConfigScreen Component
- * Configuration screen for setting up a match-based game
+ * Écran de configuration d'un match (tournoi 2 joueurs) — design Figma.
  */
 
-import { Button, Card } from '@wiowa-tech-studio/ui';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import type { MatchConfig, Player } from '../types/match';
 import type { GridSize } from '../app/app';
-import { getRecommendedGridSize } from '../hooks/useCardSize';
 
 interface MatchConfigScreenProps {
   onStartMatch: (config: MatchConfig, players: [Player, Player]) => void;
@@ -15,11 +13,35 @@ interface MatchConfigScreenProps {
   initialGridSize?: GridSize;
 }
 
-const GRID_CONFIGS: Record<GridSize, { pairCount: number }> = {
-  '4x4': { pairCount: 8 },
-  '6x6': { pairCount: 18 },
-  '8x8': { pairCount: 32 },
-};
+interface GridOption {
+  key: GridSize;
+  label: string;
+  sub: string;
+  color: string;
+  level: 1 | 2 | 3;
+}
+
+const GRID_OPTIONS: GridOption[] = [
+  { key: '4x4', label: 'Easy', sub: '4 x 4 (8 pairs)', color: '#64A18A', level: 1 },
+  { key: '6x6', label: 'Medium', sub: '6 x 6 (18 pairs)', color: '#A88550', level: 2 },
+  { key: '8x8', label: 'Hard', sub: '8 x 8 (32 pairs)', color: '#9B3A14', level: 3 },
+];
+
+/** Indicateur de niveau : 3 barres croissantes, `level` allumées. */
+function SignalBars({ level }: { level: 1 | 2 | 3 }) {
+  const heights = [8, 16, 24];
+  return (
+    <div className="flex items-end gap-[6px]" style={{ height: 24 }}>
+      {heights.map((h, i) => (
+        <span
+          key={i}
+          className="w-[5px] rounded-full bg-white"
+          style={{ height: h, opacity: i < level ? 1 : 0.3 }}
+        />
+      ))}
+    </div>
+  );
+}
 
 export function MatchConfigScreen({
   onStartMatch,
@@ -30,25 +52,6 @@ export function MatchConfigScreen({
   const [player2Name, setPlayer2Name] = useState('Player 2');
   const [gridSize, setGridSize] = useState<GridSize>(initialGridSize);
   const [roundsToWin, setRoundsToWin] = useState<2 | 3 | 4>(3);
-  const [recommendation, setRecommendation] = useState<{
-    recommended: GridSize;
-    warning?: string;
-  }>(getRecommendedGridSize());
-
-  // Update recommendation on window resize
-  useEffect(() => {
-    const handleResize = () => {
-      setRecommendation(getRecommendedGridSize());
-    };
-
-    window.addEventListener('resize', handleResize);
-    window.addEventListener('orientationchange', handleResize);
-
-    return () => {
-      window.removeEventListener('resize', handleResize);
-      window.removeEventListener('orientationchange', handleResize);
-    };
-  }, []);
 
   const handleStartMatch = () => {
     const config: MatchConfig = {
@@ -66,123 +69,158 @@ export function MatchConfigScreen({
 
   const isValid = player1Name.trim() !== '' && player2Name.trim() !== '';
 
+  const headingStyle = {
+    fontFamily: 'Akshar, sans-serif',
+    fontWeight: 600 as const,
+    fontSize: 20,
+    color: '#000000',
+  };
+
   return (
-    <div className="flex items-center justify-center min-h-[70vh]">
-      <Card className="bg-card text-card-foreground backdrop-blur-md rounded-2xl shadow-2xl p-12 text-center max-w-2xl w-full">
-        <h1 className="text-4xl font-bold text-primary mb-8 drop-shadow-lg">
-          Match Configuration
-        </h1>
-
-        {/* Player Names */}
-        <div className="mb-8">
-          <p className="text-xl text-secondary-foreground mb-4">Player Names</p>
-          <div className="space-y-3">
-            <input
-              type="text"
-              value={player1Name}
-              onChange={(e) => setPlayer1Name(e.target.value)}
-              placeholder="Player 1"
-              maxLength={20}
-              className="w-full px-4 py-3 rounded-lg bg-background text-foreground border border-input focus:outline-none focus:ring-2 focus:ring-primary"
-            />
-            <input
-              type="text"
-              value={player2Name}
-              onChange={(e) => setPlayer2Name(e.target.value)}
-              placeholder="Player 2"
-              maxLength={20}
-              className="w-full px-4 py-3 rounded-lg bg-background text-foreground border border-input focus:outline-none focus:ring-2 focus:ring-primary"
-            />
+    <div className="flex min-h-[80vh] items-center justify-center px-4 py-8">
+      <div
+        className="relative w-full max-w-[440px] overflow-hidden rounded-[40px] px-8 py-10 shadow-2xl"
+        style={{ backgroundColor: '#D1D2BF', fontFamily: 'Akshar, sans-serif' }}
+      >
+        <div className="flex flex-col items-center gap-8">
+          {/* Titre */}
+          <div className="flex flex-col items-center">
+            <span
+              className="leading-none"
+              style={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 500, fontSize: 32, color: '#2D2D2D' }}
+            >
+              Match
+            </span>
+            <span
+              className="uppercase"
+              style={{ fontFamily: 'Akshar, sans-serif', fontWeight: 400, fontSize: 12, letterSpacing: '0.05em', color: '#000000' }}
+            >
+              Best of tournament
+            </span>
           </div>
-        </div>
 
-        {/* Grid Size Selection */}
-        <div className="mb-8">
-          <p className="text-xl text-secondary-foreground mb-4">Grid Size</p>
-          <div className="flex justify-center gap-3 flex-wrap">
-            {(['4x4', '6x6', '8x8'] as GridSize[]).map((size) => {
-              const isRecommended = size === recommendation.recommended;
-              return (
-                <div key={size} className="relative">
-                  <Button
-                    onClick={() => setGridSize(size)}
-                    className={`
-                      text-secondary-foreground inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus:outline-none focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border border-input shadow-sm h-9 px-4 py-2
-                      ${
-                        gridSize === size
-                          ? 'bg-primary text-primary-foreground hover:bg-primary/90'
-                          : 'bg-background hover:bg-accent hover:text-accent-foreground'
-                      }
-                      ${isRecommended ? 'ring-2 ring-green-500' : ''}
-                    `}
-                  >
-                    {size} ({GRID_CONFIGS[size].pairCount} pairs)
-                  </Button>
-                  {isRecommended && (
-                    <span className="absolute -top-2 -right-2 bg-green-500 text-white text-xs px-2 py-0.5 rounded-full font-semibold">
-                      ✓
-                    </span>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-          {/* Warning message */}
-          {recommendation.warning && gridSize !== recommendation.recommended && (
-            <div className="mt-4 p-3 bg-yellow-500/10 border border-yellow-500/30 rounded-lg">
-              <p className="text-sm text-yellow-600 dark:text-yellow-400">
-                ⚠️ {recommendation.warning}
-              </p>
+          {/* Noms des joueurs */}
+          <section className="flex w-full flex-col items-center gap-3">
+            <h2 className="text-center uppercase" style={headingStyle}>
+              Players :
+            </h2>
+            <div className="flex w-full max-w-[280px] flex-col gap-3">
+              <input
+                type="text"
+                value={player1Name}
+                onChange={(e) => setPlayer1Name(e.target.value)}
+                placeholder="Player 1"
+                maxLength={20}
+                className="w-full rounded-lg px-4 py-3 uppercase focus:outline-none focus:ring-2 focus:ring-white"
+                style={{ backgroundColor: '#EFEFEE', color: '#434C41', fontWeight: 600, fontSize: 13, letterSpacing: '-0.03em' }}
+              />
+              <input
+                type="text"
+                value={player2Name}
+                onChange={(e) => setPlayer2Name(e.target.value)}
+                placeholder="Player 2"
+                maxLength={20}
+                className="w-full rounded-lg px-4 py-3 uppercase focus:outline-none focus:ring-2 focus:ring-white"
+                style={{ backgroundColor: '#EFEFEE', color: '#434C41', fontWeight: 600, fontSize: 13, letterSpacing: '-0.03em' }}
+              />
             </div>
-          )}
-        </div>
+          </section>
 
-        {/* Rounds to Win Selection */}
-        <div className="mb-8">
-          <p className="text-xl text-secondary-foreground mb-4">
-            Rounds to Win
-          </p>
-          <div className="flex justify-center gap-4">
-            {[2, 3, 4].map((rounds) => (
-              <button
-                key={rounds}
-                onClick={() => setRoundsToWin(rounds as 2 | 3 | 4)}
-                className={`
-                  w-16 h-16 rounded-lg border-2 font-bold text-xl
-                  transition-all duration-200
-                  ${
-                    roundsToWin === rounds
-                      ? 'bg-primary text-primary-foreground border-primary scale-110'
-                      : 'bg-background text-foreground border-input hover:border-primary hover:scale-105'
-                  }
-                `}
-              >
-                {rounds}
-              </button>
-            ))}
+          {/* Sélection de la grille */}
+          <section className="flex w-full flex-col items-center gap-3">
+            <h2 className="text-center uppercase" style={headingStyle}>
+              Select grid :
+            </h2>
+            <div className="flex w-full flex-col items-center gap-3">
+              {GRID_OPTIONS.map((opt) => {
+                const isSelected = gridSize === opt.key;
+                return (
+                  <button
+                    key={opt.key}
+                    type="button"
+                    onClick={() => setGridSize(opt.key)}
+                    className={`flex w-full max-w-[280px] items-center gap-3 rounded-lg px-6 py-3 text-left transition-all duration-200 ${
+                      isSelected ? 'scale-[1.03] ring-2 ring-white' : 'opacity-90 hover:opacity-100'
+                    }`}
+                    style={{ backgroundColor: opt.color }}
+                  >
+                    <SignalBars level={opt.level} />
+                    <span className="flex flex-col">
+                      <span
+                        className="uppercase leading-tight text-white"
+                        style={{ fontWeight: 600, fontSize: 16, letterSpacing: '-0.03em' }}
+                      >
+                        {opt.label}
+                      </span>
+                      <span className="uppercase leading-tight text-white" style={{ fontWeight: 300, fontSize: 12 }}>
+                        {opt.sub}
+                      </span>
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </section>
+
+          {/* Manches à gagner */}
+          <section className="flex w-full flex-col items-center gap-3">
+            <h2 className="text-center uppercase" style={headingStyle}>
+              Rounds to win :
+            </h2>
+            <div className="flex justify-center gap-4">
+              {[2, 3, 4].map((rounds) => {
+                const isSelected = roundsToWin === rounds;
+                return (
+                  <button
+                    key={rounds}
+                    type="button"
+                    onClick={() => setRoundsToWin(rounds as 2 | 3 | 4)}
+                    className={`flex h-14 w-14 items-center justify-center rounded-lg transition-all duration-200 ${
+                      isSelected ? 'scale-110' : 'hover:scale-105'
+                    }`}
+                    style={{
+                      backgroundColor: isSelected ? '#434C41' : '#EFEFEE',
+                      color: isSelected ? '#FFFFFF' : '#434C41',
+                      fontFamily: 'Akshar, sans-serif',
+                      fontWeight: 600,
+                      fontSize: 22,
+                    }}
+                  >
+                    {rounds}
+                  </button>
+                );
+              })}
+            </div>
+            <p
+              className="text-center uppercase"
+              style={{ fontFamily: 'Akshar, sans-serif', fontWeight: 300, fontSize: 11, letterSpacing: '-0.02em', color: '#000000' }}
+            >
+              First to win {roundsToWin} rounds wins the match
+            </p>
+          </section>
+
+          {/* Actions */}
+          <div className="flex w-full max-w-[280px] flex-col gap-3">
+            <button
+              type="button"
+              onClick={handleStartMatch}
+              disabled={!isValid}
+              className="w-full rounded-lg px-6 py-3 uppercase transition-transform duration-200 enabled:hover:scale-[1.03] disabled:opacity-50"
+              style={{ backgroundColor: '#9B3A14', color: '#FFFFFF', fontWeight: 600, fontSize: 14, letterSpacing: '-0.03em' }}
+            >
+              Start match
+            </button>
+            <button
+              type="button"
+              onClick={onCancel}
+              className="w-full rounded-lg px-6 py-3 uppercase transition-transform duration-200 hover:scale-[1.03]"
+              style={{ backgroundColor: '#EFEFEE', color: '#434C41', fontWeight: 600, fontSize: 13, letterSpacing: '-0.03em' }}
+            >
+              Cancel
+            </button>
           </div>
-          <p className="text-sm text-muted-foreground mt-3">
-            First player to win {roundsToWin} rounds wins the match!
-          </p>
         </div>
-
-        {/* Action Buttons */}
-        <div className="flex gap-4 justify-center mt-8">
-          <Button
-            onClick={onCancel}
-            className="text-secondary-foreground inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus:outline-none focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground h-9 px-4 py-2 min-w-[120px]"
-          >
-            Cancel
-          </Button>
-          <Button
-            onClick={handleStartMatch}
-            disabled={!isValid}
-            className="bg-primary text-primary-foreground hover:bg-primary/90 inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus:outline-none focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 shadow h-9 px-4 py-2 min-w-[120px]"
-          >
-            Start Match
-          </Button>
-        </div>
-      </Card>
+      </div>
     </div>
   );
 }

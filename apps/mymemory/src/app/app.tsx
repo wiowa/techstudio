@@ -1,13 +1,14 @@
-import { Button, Card, CardContent } from '@wiowa-tech-studio/ui';
+import { Button } from '@wiowa-tech-studio/ui';
 import { useEffect, useState } from 'react';
 import '../styles.css';
 import { useMatchLogic } from '../hooks/useMatchLogic';
 import type { MatchConfig, Player as MatchPlayer, RoundResult } from '../types/match';
 import { MatchConfigScreen } from '../components/MatchConfigScreen';
+import { GameStartScreen } from '../components/GameStartScreen';
 import { MatchScoreboard } from '../components/MatchScoreboard';
 import { BetweenRoundsScreen } from '../components/BetweenRoundsScreen';
 import { MatchCompleteModal } from '../components/MatchCompleteModal';
-import { useCardSize, getRecommendedGridSize } from '../hooks/useCardSize';
+import { useCardSize } from '../hooks/useCardSize';
 
 type GameCard = {
   id: number;
@@ -112,6 +113,32 @@ const GRID_CONFIGS: Record<GridSize, GridConfig> = {
   '8x8': { size: '8x8', columns: 8, pairCount: 32 },
 };
 
+// Métadonnées de difficulté par grille (couleur, libellé, niveau) — design Figma
+const DIFFICULTY: Record<
+  GridSize,
+  { label: string; sub: string; color: string; level: 1 | 2 | 3 }
+> = {
+  '4x4': { label: 'Easy', sub: '4 x 4 (8 pairs)', color: '#64A18A', level: 1 },
+  '6x6': { label: 'Medium', sub: '6 x 6 (18 pairs)', color: '#A88550', level: 2 },
+  '8x8': { label: 'Hard', sub: '8 x 8 (32 pairs)', color: '#9B3A14', level: 3 },
+};
+
+/** Indicateur de niveau (3 barres croissantes, `level` allumées). */
+function DifficultyBars({ level }: { level: 1 | 2 | 3 }) {
+  const heights = [5, 10, 15];
+  return (
+    <div className="flex items-end gap-[4px]" style={{ height: 15 }}>
+      {heights.map((h, i) => (
+        <span
+          key={i}
+          className="w-[4px] rounded-full bg-white"
+          style={{ height: h, opacity: i < level ? 1 : 0.3 }}
+        />
+      ))}
+    </div>
+  );
+}
+
 export function App() {
   const [gameMode, setGameMode] = useState<GameMode | null>(null);
   const [gridSize, setGridSize] = useState<GridSize>('6x6');
@@ -142,24 +169,6 @@ export function App() {
 
   // Dynamic card sizing based on viewport
   const { cardSize, isMobile } = useCardSize(gridSize);
-
-  // Grid size recommendation
-  const [gridRecommendation, setGridRecommendation] = useState(getRecommendedGridSize());
-
-  // Update grid recommendation on resize
-  useEffect(() => {
-    const handleResize = () => {
-      setGridRecommendation(getRecommendedGridSize());
-    };
-
-    window.addEventListener('resize', handleResize);
-    window.addEventListener('orientationchange', handleResize);
-
-    return () => {
-      window.removeEventListener('resize', handleResize);
-      window.removeEventListener('orientationchange', handleResize);
-    };
-  }, []);
 
   // Initialize game
   const initializeGame = (mode?: GameMode, size?: GridSize, matchPlayers?: [Player, Player]) => {
@@ -207,6 +216,15 @@ export function App() {
     setGameMode(null);
     setCards([]);
     endMatch();
+  };
+
+  // Rejouer la même partie (même mode / même grille)
+  const handleTryAgain = () => {
+    if (gameMode === 'two-player-match') {
+      handleRematch();
+    } else if (gameMode) {
+      initializeGame(gameMode, gridSize);
+    }
   };
 
   // Match mode handlers
@@ -344,86 +362,16 @@ export function App() {
     <div className="min-h-screen max-h-screen bg-background py-8 px-4 overflow-x-hidden">
       {/*<InstallPWA />*/}
       <div className="container mx-auto max-w-5xl">
-        {/* Mode Selection */}
+        {/* Mode Selection (design Figma) */}
         {!gameMode && (
-          <div className="flex items-center justify-center min-h-[70vh]">
-            <Card className="bg-card text-card-foreground backdrop-blur-md rounded-2xl shadow-2xl p-12 text-center max-w-2xl">
-              <h1 className="text-5xl font-bold text-primary mb-4 drop-shadow-lg">
-                Memory Game
-              </h1>
-
-              {/* Grid Size Selection */}
-              <div className="mb-8">
-                <p className="text-xl text-secondary-foreground mb-4">
-                  Select Grid Size
-                </p>
-                <div className="flex justify-center gap-4 flex-wrap">
-                  {(['4x4', '6x6', '8x8'] as GridSize[]).map((size) => {
-                    const isRecommended = size === gridRecommendation.recommended;
-                    return (
-                      <div key={size} className="relative">
-                        <Button
-                          onClick={() => setGridSize(size)}
-                          className={`
-                            text-secondary-foreground inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus:outline-none focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border border-input shadow-sm h-9 px-4 py-2
-                            ${
-                              gridSize === size
-                                ? 'bg-primary text-primary-foreground hover:bg-primary/90'
-                                : 'bg-background hover:bg-accent hover:text-accent-foreground'
-                            }
-                            ${isRecommended ? 'ring-2 ring-green-500' : ''}
-                          `}
-                        >
-                          {size} ({GRID_CONFIGS[size].pairCount} pairs)
-                        </Button>
-                        {isRecommended && (
-                          <span className="absolute -top-2 -right-2 bg-green-500 text-white text-xs px-2 py-0.5 rounded-full font-semibold">
-                            ✓
-                          </span>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-                {/* Warning message */}
-                {gridRecommendation.warning && gridSize !== gridRecommendation.recommended && (
-                  <div className="mt-4 p-3 bg-yellow-500/10 border border-yellow-500/30 rounded-lg">
-                    <p className="text-sm text-yellow-600 dark:text-yellow-400">
-                      ⚠️ {gridRecommendation.warning}
-                    </p>
-                  </div>
-                )}
-              </div>
-
-              {/* Game Mode Selection */}
-              <p className="text-xl text-secondary-foreground mb-4">
-                Select Game Mode
-              </p>
-              <div className="flex flex-col gap-4">
-                <Button
-                  size="lg"
-                  onClick={() => initializeGame('single')}
-                  className="text-secondary-foreground inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus:outline-none focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground h-9 px-4 py-2 min-w-[200px]"
-                >
-                  Single Player
-                </Button>
-                <Button
-                  size="lg"
-                  onClick={() => initializeGame('two-player')}
-                  className="text-secondary-foreground inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus:outline-none focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground h-9 px-4 py-2 min-w-[200px]"
-                >
-                  2 Players
-                </Button>
-                <Button
-                  size="lg"
-                  onClick={() => setGameMode('two-player-match')}
-                  className="text-secondary-foreground inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus:outline-none focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground h-9 px-4 py-2 min-w-[200px]"
-                >
-                  Match Mode (2 Players)
-                </Button>
-              </div>
-            </Card>
-          </div>
+          <GameStartScreen
+            initialGridSize={gridSize}
+            onStart={(mode, grid) => initializeGame(mode, grid)}
+            onStartMatch={(grid) => {
+              setGridSize(grid);
+              setGameMode('two-player-match');
+            }}
+          />
         )}
 
         {/* Match Configuration Screen */}
@@ -438,124 +386,230 @@ export function App() {
         {/* Game Screen */}
         {gameMode && cards.length > 0 && (
           <>
-            {/* Header */}
-            <div className="text-center mb-8">
-              <h1 className="text-5xl font-bold text-primary mb-4 drop-shadow-lg">
-                Memory Game
-              </h1>
-
-              {/* Match Scoreboard for Match Mode */}
-              {gameMode === 'two-player-match' && matchState && (
-                <MatchScoreboard
-                  matchState={matchState}
-                  currentRoundScores={[players[0].score, players[1].score] as [number, number]}
-                  currentPlayer={currentPlayer}
-                />
-              )}
-
-              <p className="text-xl text-secondary-foreground mb-6">
-                {gameMode === 'two-player' || gameMode === 'two-player-match'
-                  ? `${players[currentPlayer].name}'s Turn`
-                  : `Match all ${GRID_CONFIGS[gridSize].pairCount} pairs to win!`}
-              </p>
-
-              {/* Stats */}
-              {gameMode === 'single' && (
-                <div className="flex justify-center gap-8 mb-6">
-                  <Card className="bg-card text-card-foreground  backdrop-blur-sm rounded-lg px-6 py-3">
-                    <div className=" text-2xl font-bold">{moves}</div>
-                    <div className="text-sm">Moves</div>
-                  </Card>
-                  <Card className="bg-card backdrop-blur-sm rounded-lg px-6 py-3">
-                    <div className="text-2xl font-bold">
-                      {matches}/{GRID_CONFIGS[gridSize].pairCount}
-                    </div>
-                    <div className="text-sm">Matches</div>
-                  </Card>
-                </div>
-              )}
-
-              {/* Player Stats for 2-player mode */}
-              {(gameMode === 'two-player' || gameMode === 'two-player-match') && (
-                <div className="flex justify-center gap-8 mb-6">
-                  {players.map((player, idx) => (
-                    <Card
-                      key={idx}
-                      className={`
-                       bg-card text-card-foreground backdrop-blur-sm rounded-lg px-6 py-3
-                        transition-all duration-300
-                        ${
-                          idx === currentPlayer
-                            ? 'ring-4 ring-secondary scale-105'
-                            : 'opacity-70'
-                        }
-                      `}
-                    >
-                      <div className="text-2xl font-bold">{player.score}</div>
-                      <div className="text-sm">{player.name}</div>
-                    </Card>
-                  ))}
-                </div>
-              )}
-
-              <Button
-                size="lg"
-                onClick={startNewGame}
-                className="bg-secondary-foreground text-secondary"
-              >
-                New Game
-              </Button>
-            </div>
-
-            {/* Game Board */}
+            {/* Écran de jeu (design Figma) */}
             <div
-              className={`bg-white/10 backdrop-blur-md rounded-2xl shadow-2xl flex items-center justify-center ${
-                isVibrating ? 'vibrate' : ''
-              }`}
-              style={{
-                padding: isMobile ? '0.75rem' : '2rem',
-              }}
+              className="mx-auto w-fit max-w-full rounded-[40px] px-6 py-8 shadow-2xl"
+              style={{ backgroundColor: '#D1D2BF', fontFamily: 'Akshar, sans-serif' }}
             >
-              <div
-                className="grid"
-                style={{
-                  gridTemplateColumns: `repeat(${GRID_CONFIGS[gridSize].columns}, ${cardSize}px)`,
-                  gap: isMobile ? '0.25rem' : '0.75rem',
-                  maxWidth: '100%',
-                }}
-              >
-                {cards.map((card) => (
-                  <Card
-                    key={card.id}
-                    onClick={() => handleCardClick(card.id)}
-                    className={`
-                      aspect-square cursor-pointer
-                      transition-all duration-300 transform
-                      ${
-                        card.isFlipped || card.isMatched
-                          ? 'bg-card scale-105 shadow-lg'
-                          : 'bg-gradient-to-br from-secondary to-primary hover:scale-105 hover:shadow-lg'
-                      }
-                      ${card.isMatched ? 'opacity-70' : ''}
-                      ${
-                        card.isFlipped || card.isMatched ? '' : 'cursor-pointer'
-                      }
-                      active:scale-95
-                    `}
+              <div className="flex flex-col items-center gap-6">
+                {/* Logo MindGym */}
+                <div className="flex flex-col items-center gap-1">
+                  <img
+                    src="/assets/game/mindgym-logo.svg"
+                    alt="MindGym"
+                    className="h-auto w-[80px]"
+                  />
+                  <span
+                    className="leading-none text-black"
+                    style={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 700, fontSize: 20 }}
                   >
-                    <CardContent
-                      className={`flex items-center justify-center h-full p-0 font-bold ${
-                        gridSize === '8x8'
-                          ? 'text-2xl'
-                          : gridSize === '6x6'
-                          ? 'text-4xl'
-                          : 'text-5xl'
-                      }`}
+                    MindGym
+                  </span>
+                  <span
+                    className="uppercase text-black"
+                    style={{
+                      fontFamily: 'Montserrat, sans-serif',
+                      fontWeight: 700,
+                      fontSize: 8,
+                      letterSpacing: '0.05em',
+                    }}
+                  >
+                    Train your brain
+                  </span>
+                </div>
+
+                {/* Stats : Moves / Matches / Difficulté */}
+                <div className="flex flex-wrap items-stretch justify-center gap-3">
+                  <div
+                    className="flex min-w-[100px] flex-col items-center justify-center rounded-lg px-4 py-3"
+                    style={{ backgroundColor: '#3A413A' }}
+                  >
+                    <span
+                      style={{
+                        fontFamily: 'Akshar, sans-serif',
+                        fontWeight: 600,
+                        fontSize: 28,
+                        letterSpacing: '0.1em',
+                        color: '#F2F2F2',
+                        lineHeight: 1,
+                      }}
                     >
-                      {card.isFlipped || card.isMatched ? card.symbol : '?'}
-                    </CardContent>
-                  </Card>
-                ))}
+                      {moves}
+                    </span>
+                    <span
+                      className="uppercase"
+                      style={{ fontFamily: 'Akshar, sans-serif', fontWeight: 400, fontSize: 10, color: '#F2F2F2' }}
+                    >
+                      Moves
+                    </span>
+                  </div>
+                  <div
+                    className="flex min-w-[100px] flex-col items-center justify-center rounded-lg px-4 py-3"
+                    style={{ backgroundColor: 'rgba(30, 71, 30, 0.61)' }}
+                  >
+                    <span style={{ color: '#F2F2F2', lineHeight: 1 }}>
+                      <span
+                        style={{ fontFamily: 'Akshar, sans-serif', fontWeight: 600, fontSize: 28, letterSpacing: '0.1em' }}
+                      >
+                        {matches}
+                      </span>
+                      <span
+                        style={{ fontFamily: 'Akshar, sans-serif', fontWeight: 400, fontSize: 15, letterSpacing: '0.1em' }}
+                      >
+                        /{GRID_CONFIGS[gridSize].pairCount}
+                      </span>
+                    </span>
+                    <span
+                      className="uppercase"
+                      style={{ fontFamily: 'Akshar, sans-serif', fontWeight: 400, fontSize: 10, color: '#F2F2F2' }}
+                    >
+                      Matches
+                    </span>
+                  </div>
+                  <div
+                    className="flex min-w-[100px] items-center gap-2 rounded-lg px-4 py-3"
+                    style={{ backgroundColor: DIFFICULTY[gridSize].color }}
+                  >
+                    <DifficultyBars level={DIFFICULTY[gridSize].level} />
+                    <div className="flex flex-col">
+                      <span
+                        className="uppercase leading-tight text-white"
+                        style={{ fontFamily: 'Akshar, sans-serif', fontWeight: 600, fontSize: 13, letterSpacing: '-0.03em' }}
+                      >
+                        {DIFFICULTY[gridSize].label}
+                      </span>
+                      <span
+                        className="uppercase leading-tight text-white"
+                        style={{ fontFamily: 'Akshar, sans-serif', fontWeight: 300, fontSize: 10, letterSpacing: '-0.03em' }}
+                      >
+                        {DIFFICULTY[gridSize].sub}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Scoreboard mode match */}
+                {gameMode === 'two-player-match' && matchState && (
+                  <MatchScoreboard
+                    matchState={matchState}
+                    currentRoundScores={[players[0].score, players[1].score] as [number, number]}
+                    currentPlayer={currentPlayer}
+                  />
+                )}
+
+                {/* Scores mode 2 joueurs */}
+                {(gameMode === 'two-player' || gameMode === 'two-player-match') && (
+                  <div className="flex items-center justify-center gap-4">
+                    {players.map((player, idx) => (
+                      <div
+                        key={idx}
+                        className={`rounded-lg px-4 py-2 text-center transition-all ${
+                          idx === currentPlayer ? 'scale-105 ring-2 ring-black' : 'opacity-70'
+                        }`}
+                        style={{ backgroundColor: '#EFEFEE' }}
+                      >
+                        <div className="text-xl font-bold" style={{ color: '#434C41' }}>
+                          {player.score}
+                        </div>
+                        <div className="text-xs uppercase" style={{ color: '#434C41' }}>
+                          {player.name}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Boutons d'action */}
+                <div className="flex flex-wrap items-center justify-center gap-2">
+                  <button
+                    type="button"
+                    onClick={startNewGame}
+                    className="flex items-center justify-center gap-2 rounded-lg px-6 py-3 transition-transform hover:scale-[1.03]"
+                    style={{ backgroundColor: '#EFEFEE' }}
+                  >
+                    <img src="/assets/game/icon-back.svg" alt="" className="h-5 w-5" />
+                    <span
+                      className="uppercase"
+                      style={{ fontFamily: 'Akshar, sans-serif', fontWeight: 600, fontSize: 13, letterSpacing: '-0.03em', color: '#434C41' }}
+                    >
+                      Change mode
+                    </span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleTryAgain}
+                    className="flex items-center justify-center gap-2 rounded-lg px-6 py-3 transition-transform hover:scale-[1.03]"
+                    style={{ backgroundColor: '#EFEFEE' }}
+                  >
+                    <img src="/assets/game/icon-retry.svg" alt="" className="h-[18px] w-[18px]" />
+                    <span
+                      className="uppercase"
+                      style={{ fontFamily: 'Akshar, sans-serif', fontWeight: 600, fontSize: 13, letterSpacing: '-0.03em', color: '#434C41' }}
+                    >
+                      Try again
+                    </span>
+                  </button>
+                </div>
+
+                {/* Consigne / tour */}
+                <p
+                  className="text-center uppercase text-black"
+                  style={{ fontFamily: 'Akshar, sans-serif', fontWeight: 500, fontSize: 16, letterSpacing: '0.05em' }}
+                >
+                  {gameMode === 'two-player' || gameMode === 'two-player-match'
+                    ? `${players[currentPlayer].name}'s turn`
+                    : `Match all ${GRID_CONFIGS[gridSize].pairCount} pairs to win`}
+                </p>
+
+                {/* Plateau */}
+                <div className={`flex items-center justify-center ${isVibrating ? 'vibrate' : ''}`}>
+                  <div
+                    className="grid"
+                    style={{
+                      gridTemplateColumns: `repeat(${GRID_CONFIGS[gridSize].columns}, ${cardSize}px)`,
+                      gap: isMobile ? '0.25rem' : '0.4rem',
+                      maxWidth: '100%',
+                    }}
+                  >
+                    {cards.map((card) => {
+                      const revealed = card.isFlipped || card.isMatched;
+                      return (
+                        <div
+                          key={card.id}
+                          onClick={() => handleCardClick(card.id)}
+                          className="aspect-square cursor-pointer transition-transform duration-300 hover:scale-[1.03] active:scale-95"
+                        >
+                          {revealed ? (
+                            <div
+                              className={`flex h-full w-full items-center justify-center rounded-[5px] font-bold ${
+                                card.isMatched ? 'opacity-80' : ''
+                              } ${
+                                gridSize === '8x8'
+                                  ? 'text-2xl'
+                                  : gridSize === '6x6'
+                                  ? 'text-4xl'
+                                  : 'text-5xl'
+                              }`}
+                              style={{
+                                backgroundColor: '#F1F9FF',
+                                boxShadow: '0.64px 0.64px 0px rgba(230, 237, 242, 1)',
+                              }}
+                            >
+                              {card.symbol}
+                            </div>
+                          ) : (
+                            <img
+                              src="/assets/game/card-back.svg"
+                              alt=""
+                              className="h-full w-full"
+                              draggable={false}
+                            />
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
               </div>
             </div>
 
