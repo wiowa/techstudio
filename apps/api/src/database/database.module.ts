@@ -3,6 +3,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { User } from '../users/entities/user.entity';
 import { RefreshToken } from '../auth/entities/refresh-token.entity';
+import { MymemorySession } from '../games/mymemory/entities/mymemory-session.entity';
+import { MymotusSession } from '../games/mymotus/entities/mymotus-session.entity';
 
 @Module({
   imports: [
@@ -16,7 +18,7 @@ import { RefreshToken } from '../auth/entities/refresh-token.entity';
         username: configService.get('DATABASE_USERNAME'),
         password: configService.get('DATABASE_PASSWORD'),
         database: configService.get('DATABASE_NAME'),
-        entities: [User, RefreshToken],
+        entities: [User, RefreshToken, MymemorySession, MymotusSession],
         synchronize: configService.get('NODE_ENV') === 'development',
         logging: configService.get('NODE_ENV') === 'development',
       }),

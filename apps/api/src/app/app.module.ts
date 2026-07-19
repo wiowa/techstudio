@@ -7,6 +7,8 @@ import { ConfigModule } from '../config/config.module';
 import { DatabaseModule } from '../database/database.module';
 import { AuthModule } from '../auth/auth.module';
 import { UsersModule } from '../users/users.module';
+import { MymemoryModule } from '../games/mymemory/mymemory.module';
+import { MymotusModule } from '../games/mymotus/mymotus.module';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 @Module({
@@ -21,6 +23,8 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
     ]),
     AuthModule,
     UsersModule,
+    MymemoryModule,
+    MymotusModule,
   ],
   controllers: [AppController],
   providers: [
