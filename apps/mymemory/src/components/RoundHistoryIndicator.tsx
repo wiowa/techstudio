@@ -1,6 +1,6 @@
 /**
  * RoundHistoryIndicator Component
- * Visual indicator showing who won each completed round
+ * Indicateur visuel des manches gagnées (design harmonisé).
  */
 
 import type { RoundResult, Player } from '../types/match';
@@ -12,13 +12,14 @@ interface RoundHistoryIndicatorProps {
   roundsToWin: number;
 }
 
+// Accents par joueur (cohérents avec les écrans du mode match)
+const PLAYER_COLORS = ['#64A18A', '#A88550'];
+
 export function RoundHistoryIndicator({
   roundHistory,
   players,
-  currentRound,
   roundsToWin,
 }: RoundHistoryIndicatorProps) {
-  // Create array of indicators (filled for won, empty for remaining)
   const indicators = Array.from({ length: roundsToWin }, (_, index) => {
     const round = roundHistory[index];
     return {
@@ -40,28 +41,23 @@ export function RoundHistoryIndicator({
               : `Round ${index + 1}: Not played yet`
           }
         >
-          {/* Player 1 indicator */}
-          <div
-            className={`
-              w-3 h-3 rounded-full transition-all duration-300
-              ${
-                hasResult && winner === 0
-                  ? 'bg-primary scale-110'
-                  : 'bg-muted border border-muted-foreground/30'
-              }
-            `}
+          {/* Indicateur joueur 1 */}
+          <span
+            className="h-3 w-3 rounded-full transition-all duration-300"
+            style={{
+              backgroundColor:
+                hasResult && winner === 0 ? PLAYER_COLORS[0] : 'rgba(67, 76, 65, 0.15)',
+              transform: hasResult && winner === 0 ? 'scale(1.1)' : 'none',
+            }}
           />
-
-          {/* Player 2 indicator */}
-          <div
-            className={`
-              w-3 h-3 rounded-full transition-all duration-300
-              ${
-                hasResult && winner === 1
-                  ? 'bg-secondary scale-110'
-                  : 'bg-muted border border-muted-foreground/30'
-              }
-            `}
+          {/* Indicateur joueur 2 */}
+          <span
+            className="h-3 w-3 rounded-full transition-all duration-300"
+            style={{
+              backgroundColor:
+                hasResult && winner === 1 ? PLAYER_COLORS[1] : 'rgba(67, 76, 65, 0.15)',
+              transform: hasResult && winner === 1 ? 'scale(1.1)' : 'none',
+            }}
           />
         </div>
       ))}

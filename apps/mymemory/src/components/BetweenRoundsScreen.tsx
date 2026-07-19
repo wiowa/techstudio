@@ -1,9 +1,8 @@
 /**
  * BetweenRoundsScreen Component
- * Displayed between rounds with statistics and next round options
+ * Écran affiché entre deux manches (design harmonisé).
  */
 
-import { Button, Card } from '@wiowa-tech-studio/ui';
 import { useState } from 'react';
 import type { RoundResult, MatchState } from '../types/match';
 import type { GridSize } from '../app/app';
@@ -14,6 +13,14 @@ interface BetweenRoundsScreenProps {
   matchState: MatchState;
   onNextRound: (newGridSize?: GridSize) => void;
 }
+
+const GRID_META: Record<GridSize, { label: string; color: string }> = {
+  '4x4': { label: 'Easy', color: '#64A18A' },
+  '6x6': { label: 'Medium', color: '#A88550' },
+  '8x8': { label: 'Hard', color: '#9B3A14' },
+};
+
+const PLAYER_COLORS = ['#64A18A', '#A88550'];
 
 function formatDuration(milliseconds: number): string {
   const seconds = Math.floor(milliseconds / 1000);
@@ -27,9 +34,7 @@ export function BetweenRoundsScreen({
   matchState,
   onNextRound,
 }: BetweenRoundsScreenProps) {
-  const [selectedGridSize, setSelectedGridSize] = useState<GridSize>(
-    roundResult.gridSize
-  );
+  const [selectedGridSize, setSelectedGridSize] = useState<GridSize>(roundResult.gridSize);
 
   const winner = matchState.players[roundResult.winner];
 
@@ -38,121 +43,117 @@ export function BetweenRoundsScreen({
     onNextRound(gridSizeChanged ? selectedGridSize : undefined);
   };
 
+  const labelStyle = {
+    fontFamily: 'Akshar, sans-serif',
+    fontWeight: 400 as const,
+    fontSize: 12,
+    letterSpacing: '0.05em',
+    color: '#434C41',
+  };
+
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <Card className="bg-card text-card-foreground rounded-2xl p-8 max-w-2xl w-full shadow-2xl">
-        {/* Round Complete Header */}
-        <div className="text-center mb-6">
-          <div className="text-5xl mb-4">🎉</div>
-          <h2 className="text-3xl font-bold text-primary mb-2">
-            Round {roundResult.roundNumber} Complete!
-          </h2>
-          <p className="text-2xl font-bold text-foreground">
-            {winner.name} Wins This Round!
-          </p>
-        </div>
-
-        {/* Match Score */}
-        <div className="mb-6">
-          <p className="text-center text-sm text-muted-foreground mb-3">
-            Match Score
-          </p>
-          <div className="flex items-center justify-center gap-4">
-            <div className="text-center">
-              <div className="text-2xl font-bold text-primary">
-                {matchState.matchScore[0]}
-              </div>
-              <div className="text-sm text-muted-foreground">
-                {matchState.players[0].name}
-              </div>
-            </div>
-
-            <RoundHistoryIndicator
-              roundHistory={matchState.roundHistory}
-              players={matchState.players}
-              currentRound={matchState.currentRound}
-              roundsToWin={matchState.config.roundsToWin}
-            />
-
-            <div className="text-center">
-              <div className="text-2xl font-bold text-secondary">
-                {matchState.matchScore[1]}
-              </div>
-              <div className="text-sm text-muted-foreground">
-                {matchState.players[1].name}
-              </div>
-            </div>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
+      <div
+        className="max-h-[90vh] w-full max-w-[440px] overflow-y-auto rounded-[40px] px-8 py-8 shadow-2xl"
+        style={{ backgroundColor: '#D1D2BF', fontFamily: 'Akshar, sans-serif' }}
+      >
+        <div className="flex flex-col items-center gap-6">
+          {/* En-tête */}
+          <div className="flex flex-col items-center gap-1">
+            <div className="text-4xl">🎉</div>
+            <span
+              className="leading-none"
+              style={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 500, fontSize: 26, color: '#2D2D2D' }}
+            >
+              Round {roundResult.roundNumber} complete
+            </span>
+            <span className="uppercase" style={{ fontWeight: 600, fontSize: 15, letterSpacing: '-0.02em', color: '#000000' }}>
+              {winner.name} wins this round
+            </span>
           </div>
-        </div>
 
-        {/* Round Statistics */}
-        <div className="mb-6">
-          <p className="text-center text-sm text-muted-foreground mb-3">
-            Round {roundResult.roundNumber} Statistics
-          </p>
-          <div className="bg-muted/30 rounded-lg p-4">
-            <div className="grid grid-cols-2 gap-4 text-sm">
-              <div>
-                <span className="font-semibold">
-                  {matchState.players[0].name}:
-                </span>{' '}
-                {roundResult.scores[0]} pairs
-              </div>
-              <div>
-                <span className="font-semibold">
-                  {matchState.players[1].name}:
-                </span>{' '}
-                {roundResult.scores[1]} pairs
-              </div>
-              <div className="col-span-2 text-center text-muted-foreground">
-                Duration: {formatDuration(roundResult.duration)} | Total Moves:{' '}
-                {roundResult.moves}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Grid Size Selection for Next Round */}
-        <div className="mb-6">
-          <p className="text-center text-sm text-muted-foreground mb-3">
-            Grid Size for Next Round
-          </p>
-          <div className="flex justify-center gap-3">
-            {(['4x4', '6x6', '8x8'] as GridSize[]).map((size) => (
-              <Button
-                key={size}
-                onClick={() => setSelectedGridSize(size)}
-                className={`
-                  text-secondary-foreground inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus:outline-none focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border border-input shadow-sm h-9 px-4 py-2
-                  ${
-                    selectedGridSize === size
-                      ? 'bg-primary text-primary-foreground hover:bg-primary/90'
-                      : 'bg-background hover:bg-accent hover:text-accent-foreground'
-                  }
-                `}
-              >
-                {size}
-              </Button>
-            ))}
-          </div>
-          {selectedGridSize !== roundResult.gridSize && (
-            <p className="text-center text-xs text-muted-foreground mt-2">
-              Changed from {roundResult.gridSize} to {selectedGridSize}
+          {/* Score du match */}
+          <div className="flex w-full flex-col items-center gap-2">
+            <p className="text-center uppercase" style={labelStyle}>
+              Match score
             </p>
-          )}
-        </div>
+            <div className="flex items-center justify-center gap-5">
+              <div className="text-center">
+                <div style={{ fontWeight: 600, fontSize: 26, lineHeight: 1, color: PLAYER_COLORS[0] }}>
+                  {matchState.matchScore[0]}
+                </div>
+                <div className="uppercase" style={{ fontWeight: 400, fontSize: 11, color: '#434C41' }}>
+                  {matchState.players[0].name}
+                </div>
+              </div>
+              <RoundHistoryIndicator
+                roundHistory={matchState.roundHistory}
+                players={matchState.players}
+                currentRound={matchState.currentRound}
+                roundsToWin={matchState.config.roundsToWin}
+              />
+              <div className="text-center">
+                <div style={{ fontWeight: 600, fontSize: 26, lineHeight: 1, color: PLAYER_COLORS[1] }}>
+                  {matchState.matchScore[1]}
+                </div>
+                <div className="uppercase" style={{ fontWeight: 400, fontSize: 11, color: '#434C41' }}>
+                  {matchState.players[1].name}
+                </div>
+              </div>
+            </div>
+          </div>
 
-        {/* Next Round Button */}
-        <div className="text-center">
-          <Button
-            size="lg"
+          {/* Statistiques de la manche */}
+          <div className="w-full max-w-[300px]">
+            <div
+              className="flex flex-col gap-1 rounded-lg px-4 py-3 text-center uppercase"
+              style={{ backgroundColor: '#EFEFEE', fontWeight: 300, fontSize: 11, letterSpacing: '-0.02em', color: '#434C41' }}
+            >
+              <span>
+                {matchState.players[0].name}: {roundResult.scores[0]} pairs · {matchState.players[1].name}: {roundResult.scores[1]} pairs
+              </span>
+              <span>
+                Duration {formatDuration(roundResult.duration)} · Moves {roundResult.moves}
+              </span>
+            </div>
+          </div>
+
+          {/* Grille pour la prochaine manche */}
+          <div className="flex w-full flex-col items-center gap-2">
+            <p className="text-center uppercase" style={labelStyle}>
+              Grid for next round
+            </p>
+            <div className="flex justify-center gap-2">
+              {(['4x4', '6x6', '8x8'] as GridSize[]).map((size) => {
+                const isSelected = selectedGridSize === size;
+                return (
+                  <button
+                    key={size}
+                    type="button"
+                    onClick={() => setSelectedGridSize(size)}
+                    className={`rounded-lg px-4 py-2 uppercase transition-all duration-200 ${
+                      isSelected ? 'scale-105 ring-2 ring-white' : 'opacity-90 hover:opacity-100'
+                    }`}
+                    style={{ backgroundColor: GRID_META[size].color, color: '#FFFFFF', fontWeight: 600, fontSize: 12, letterSpacing: '-0.03em' }}
+                  >
+                    {GRID_META[size].label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Bouton manche suivante */}
+          <button
+            type="button"
             onClick={handleNextRound}
-            className="bg-primary text-primary-foreground hover:bg-primary/90 min-w-[200px]"
+            className="w-full max-w-[300px] rounded-lg px-6 py-3 uppercase transition-transform duration-200 hover:scale-[1.03]"
+            style={{ backgroundColor: '#9B3A14', color: '#FFFFFF', fontWeight: 600, fontSize: 14, letterSpacing: '-0.03em' }}
           >
-            Next Round
-          </Button>
+            Next round
+          </button>
         </div>
-      </Card>
+      </div>
     </div>
   );
 }

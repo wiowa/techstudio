@@ -1,9 +1,8 @@
 /**
  * MatchScoreboard Component
- * Displays match progress during gameplay
+ * Progression du match pendant la partie (design harmonisé).
  */
 
-import { Card } from '@wiowa-tech-studio/ui';
 import type { MatchState } from '../types/match';
 import { RoundHistoryIndicator } from './RoundHistoryIndicator';
 
@@ -13,78 +12,83 @@ interface MatchScoreboardProps {
   currentPlayer: 0 | 1;
 }
 
+const PLAYER_COLORS = ['#64A18A', '#A88550'];
+
 export function MatchScoreboard({
   matchState,
   currentRoundScores,
   currentPlayer,
 }: MatchScoreboardProps) {
-  const { players, currentRound, matchScore, roundHistory, config } =
-    matchState;
+  const { players, currentRound, matchScore, roundHistory, config } = matchState;
 
   return (
-    <Card className="bg-card text-card-foreground border-b backdrop-blur-sm rounded-lg mb-6 p-4">
-      <div className="flex flex-col gap-3">
-        {/* Round Counter */}
-        <div className="text-center">
-          <span className="text-sm font-medium text-muted-foreground">
-            Round {currentRound} | First to {config.roundsToWin}
+    <div
+      className="flex w-full max-w-[320px] flex-col gap-3 rounded-2xl px-5 py-4"
+      style={{ backgroundColor: '#EFEFEE', fontFamily: 'Akshar, sans-serif' }}
+    >
+      {/* Compteur de manche */}
+      <p
+        className="text-center uppercase"
+        style={{ fontWeight: 400, fontSize: 12, letterSpacing: '0.05em', color: '#434C41' }}
+      >
+        Round {currentRound} | First to {config.roundsToWin}
+      </p>
+
+      {/* Score du match + historique */}
+      <div className="flex items-center justify-between gap-3">
+        {/* Joueur 1 */}
+        <div
+          className="flex flex-1 flex-col items-end text-right transition-all duration-300"
+          style={{ opacity: currentPlayer === 0 ? 1 : 0.6 }}
+        >
+          <span
+            className="uppercase leading-none"
+            style={{ fontWeight: 600, fontSize: 13, letterSpacing: '-0.03em', color: '#434C41' }}
+          >
+            {players[0].name}
+          </span>
+          <span style={{ fontWeight: 600, fontSize: 26, lineHeight: 1, color: PLAYER_COLORS[0] }}>
+            {matchScore[0]}
           </span>
         </div>
 
-        {/* Match Score and Round History */}
-        <div className="flex items-center justify-center gap-6">
-          {/* Player 1 */}
-          <div className="flex items-center gap-3">
-            <div
-              className={`text-right transition-all duration-300 ${
-                currentPlayer === 0 ? 'scale-110' : 'opacity-70'
-              }`}
-            >
-              <div className="text-lg font-bold text-foreground">
-                {players[0].name}
-              </div>
-              <div className="text-2xl font-bold text-primary">
-                {matchScore[0]}
-              </div>
-            </div>
-          </div>
+        <RoundHistoryIndicator
+          roundHistory={roundHistory}
+          players={players}
+          currentRound={currentRound}
+          roundsToWin={config.roundsToWin}
+        />
 
-          {/* Round History Indicators */}
-          <RoundHistoryIndicator
-            roundHistory={roundHistory}
-            players={players}
-            currentRound={currentRound}
-            roundsToWin={config.roundsToWin}
-          />
-
-          {/* Player 2 */}
-          <div className="flex items-center gap-3">
-            <div
-              className={`text-left transition-all duration-300 ${
-                currentPlayer === 1 ? 'scale-110' : 'opacity-70'
-              }`}
-            >
-              <div className="text-lg font-bold text-foreground">
-                {players[1].name}
-              </div>
-              <div className="text-2xl font-bold text-secondary">
-                {matchScore[1]}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Current Round Scores */}
-        <div className="flex items-center justify-center gap-4 text-sm text-muted-foreground">
-          <span>
-            {players[0].name}: {currentRoundScores[0]} pairs
+        {/* Joueur 2 */}
+        <div
+          className="flex flex-1 flex-col items-start text-left transition-all duration-300"
+          style={{ opacity: currentPlayer === 1 ? 1 : 0.6 }}
+        >
+          <span
+            className="uppercase leading-none"
+            style={{ fontWeight: 600, fontSize: 13, letterSpacing: '-0.03em', color: '#434C41' }}
+          >
+            {players[1].name}
           </span>
-          <span>|</span>
-          <span>
-            {players[1].name}: {currentRoundScores[1]} pairs
+          <span style={{ fontWeight: 600, fontSize: 26, lineHeight: 1, color: PLAYER_COLORS[1] }}>
+            {matchScore[1]}
           </span>
         </div>
       </div>
-    </Card>
+
+      {/* Scores de la manche en cours */}
+      <div
+        className="flex items-center justify-center gap-3 uppercase"
+        style={{ fontWeight: 300, fontSize: 11, letterSpacing: '-0.02em', color: '#434C41' }}
+      >
+        <span>
+          {players[0].name}: {currentRoundScores[0]} pairs
+        </span>
+        <span>|</span>
+        <span>
+          {players[1].name}: {currentRoundScores[1]} pairs
+        </span>
+      </div>
+    </div>
   );
 }
